@@ -1,0 +1,71 @@
+<div class="row wrapper">
+    <div class="col-md-12 text-center" *ngIf="!selectedRole && !loading">
+        <img src="assets/images/no-record.png" />
+        <h3>No roles yet</h3>
+        <h5>Please add first role to manage permissions</h5>
+        <h5><a (click)="addNewRole()">Click Here OR `+` Button to Add First Role</a></h5>
+    </div>
+    <ng-container *ngIf="selectedRole">
+        <div class="col-md-3">
+            <div class="content-header">
+                <h3>
+                    Roles
+                </h3>
+            </div>
+            <mat-nav-list>
+                <mat-list-item *ngFor="let role of roles;let i=index" (click)="selectRole(i)"
+                    [class.active]="i==selectedIndex" [matTooltip]="role.name">
+                    <span matLine>{{ role.name }}</span>
+                    <ng-container *ifRole="{app: {codes: ['role_delete']}}">
+                        <button matTooltip="Remove Role" matTooltipPosition="above" *ngIf="!role.constant"
+                            mat-icon-button (click)="deleteRole($event, role, i)">
+                            <mat-icon class="delete">delete</mat-icon>
+                        </button>
+                    </ng-container>
+                    <ng-container *ifRole="{app: {codes: ['role_edit']}}">
+                        <button matTooltip="Edit Role" *ngIf="!role.constant" mat-icon-button
+                            (click)="editRole($event, role, i)">
+                            <mat-icon class="edit">edit</mat-icon>
+                        </button>
+                    </ng-container>
+                </mat-list-item>
+            </mat-nav-list>
+        </div>
+        <div class="col-md-9">
+            <div class="content-header">
+                <h3>
+                    {{selectedRole?.name}} Permissions
+                </h3>
+            </div>
+            <div class="config-check">
+                <mat-card *ngFor="let permissionSet of allPermissions" class="permission-module">
+                    <mat-checkbox [disabled]="!canEditRoles"
+                        color="{{permissionSet.indeterminate ? 'accent' : 'primary'}}"
+                        (change)="selectWholeModule($event, permissionSet)"
+                        [(indeterminate)]="permissionSet.indeterminate" [(ngModel)]="permissionSet.checkedAll">
+                        <span class="module-name">{{permissionSet.module}}</span>
+                    </mat-checkbox>
+                    <div class="sub-set">
+                        <ng-container *ngFor="let permission of permissionSet.permissions;let j=index;">
+                            <mat-checkbox [matTooltip]="permission.tooltip" [disabled]="!canEditRoles"
+                                class="module-permission" name="permission2-{{j}}"
+                                [(ngModel)]="model[permissionSet.module + '~' + permission.code]"
+                                (change)="selectPermission($event, permissionSet, permission)">
+                                <span class="permission-title">{{permission.name}}</span>
+                            </mat-checkbox>
+                        </ng-container>
+                    </div>
+                </mat-card>
+            </div>
+            <div class="btn-section" *ifRole="{app: {codes: ['role_edit']}}">
+                <button mat-stroked-button (click)="resetSelection()" class="btn-reset">Reset</button>
+                <button mat-stroked-button (click)="savePermissions()" class="btn-save">Save Permissions</button>
+            </div>
+        </div>
+    </ng-container>
+</div>
+<ngx-spinner [fullScreen]="false" bdColor="rgba(51,51,51,0.8)" color="#fff" type="timer" title="Click to hide"
+    (click)="spinner.hide()"></ngx-spinner>
+<button matTooltip="Add New Role" class="fab-1" mat-fab *ifRole="{app: {codes: ['role_add']}}" (click)="addNewRole()" color="warn">
+    <mat-icon>add</mat-icon>
+</button>

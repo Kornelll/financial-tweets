@@ -1,0 +1,42 @@
+.card {
+    margin-bottom: 10px;
+}
+
+.card-body p {
+    margin-top: 20px;
+}
+
+.flex-space {
+    display: flex;
+    justify-content: space-between;
+}
+
+.list-group-flush .list-group-item {
+    border-bottom: 0;
+}
+
+.text-gray {
+    color: gray;
+}
+
+.font-weight-light {
+    color: #838383;
+}
+
+.sticky-top {
+    background: #354052;
+    padding-top: 13px;
+    color: white;
+
+    hr {
+        margin: 0;
+        border-top: 1px solid #808080f5;
+    }
+}
+@media only screen and (max-width: 600px) {
+    .sticky-top {
+        * {
+            font-size: 10px;
+        }
+    }
+  }

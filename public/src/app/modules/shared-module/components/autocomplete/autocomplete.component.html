@@ -1,0 +1,30 @@
+<mat-form-field appearance="{{appearance}}" [floatLabel]="floatLabel" #formField1 style="font-size: inherit; width: 100%" (click)="forceKeepOpenning(matInputAuto)">
+    <mat-label *ngIf="label">{{label}}</mat-label>
+    <input type="search" [required]="!!required" id="{{randomId}}" autocomplete="{{randomId}}" #matInputAuto (blur)="onBlurred()" maxlength="50" #inputControl (focus)="inputFocused(matInputAuto)" matInput placeholder="{{placeholder}}" [matAutocomplete]="auto" [formControl]="inpCtrl">
+    <mat-spinner matSuffix style="margin-right: 5px" [diameter]="18" [class.hide]="!submitted"></mat-spinner>
+    <i *ngFor="let icon of icons; let i=index;" matSuffix [style.color]="icon.color ? icon.color : 'black'" [style.font-size]="icon.size ? icon.size : '14px'" class="{{icon.fas}} fa fa-{{icon.fa}} suffix-icons" [matTooltip]="icon.title" [class.hide]="(icon.notNull && !matInputAuto.value)"
+        (click)="iconClick.emit(i);icon.dontStopPropagation ? '' : $event.stopPropagation();"></i>
+
+    <i class="fa fa-times-circle" *ngIf="clearIcon && !disabled && matInputAuto?.value" (click)="resetValue()" matSuffix></i>
+
+    <mat-autocomplete (optionSelected)="onOptionSelected($event)" #auto="matAutocomplete" [displayWith]="displayValue.bind(this)">
+        <mat-option *ngFor="let item of records" [value]="item" [matTooltip]="showTooltip ? item[showProp] + ' ' + (item[showProp2] || '') : ''">
+            <ng-container *ngIf="tickProp">
+                <i class="fa fa-check" *ngIf="item[tickProp]"></i>
+                <i class="fa fa-blank" *ngIf="!item[tickProp]"></i>
+            </ng-container>
+            <span *ngIf="showProp2; else alt">{{ item[showProp] }} {{showProp2Prefix}}
+                {{item | dotfield:showProp2}}</span>
+            <ng-template #alt>
+                <span *ngIf="showProp;else rawItem;">
+                    {{ item[showProp]  }}
+                </span>
+                <ng-template #rawItem>{{item}}</ng-template>
+            </ng-template>
+        </mat-option>
+    </mat-autocomplete>
+    <mat-hint *ngIf="hint">{{hint}}</mat-hint>
+    <mat-error>
+        <ng-container *ngIf="inpCtrl.hasError('required')">{{required}}</ng-container>
+    </mat-error>
+</mat-form-field>

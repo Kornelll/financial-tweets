@@ -1,0 +1,34 @@
+.image-cropper-dialog {
+    width: 500px;
+    max-height: 600px;
+    padding: 5px;
+}
+
+.scroll-container {
+    height: auto;
+    max-height: 70vh;
+    overflow: auto;
+    margin-bottom: 25px;
+}
+
+h1 {
+    font-size: 17px;
+}
+
+.row-btn {
+    margin-top: 10px;
+}
+
+.btn-section button {
+    margin-right: 10px;
+}
+
+mat-checkbox {
+    float: right;
+}
+
+.error {
+    margin-top: 5px;
+    color: red;
+    font-size: 15px;
+}

@@ -1,0 +1,8 @@
+<mat-nav-list>
+    <mat-list-item (click)="router.navigate([link.routerLink])" *ngFor="let link of dashboardService?.currentList; let i=index;" [class.active]="i == dashboardService.selectedIndex" class="animated slideInLeft"
+    [matTooltip]="link.tooltip"
+    >
+        <i class="fa fa-{{link.icon}}" matListIcon *ngIf="link.icon"></i>
+        <a matLine>{{ link.title }}</a>
+    </mat-list-item>
+</mat-nav-list>

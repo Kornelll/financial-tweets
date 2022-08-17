@@ -1,0 +1,125 @@
+<mat-card class="main-card" *ngIf="model">
+  <h3>{{selectedId ? 'Update' : 'Add New'}} User</h3>
+  <mat-card-content>
+    <form #UserForm="ngForm">
+      <div class="content">
+        <div>
+          <img style="border-radius: 50%"
+            [src]="model.avatar || (model.avatarSrc ? BASE_URL + model.avatarSrc : 'assets/icons/user-icon.png')"
+            alt="Avatar" class="avatar">
+          <button type="button" (click)="selectAvatar();" class="btn btn-primary">Browse</button>
+        </div>
+        <div>
+          <mat-form-field appearance="fill">
+            <mat-label>Name</mat-label>
+            <input trim="blur" matInput placeholder="Full Name e.g. John Doe" id="name" maxlength="30" #name="ngModel"
+              name="Name" [(ngModel)]="model.name" required pattern="^[a-zA-Z0-9].*">
+            <mat-error>
+              <ng-container *ngIf="name?.errors?.required">Name is required</ng-container>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Email</mat-label>
+            <input trim="blur" matInput type="email" placeholder="Valid Email e.g. john.doe@example.com"
+              #emailControl="ngModel" name="email" [(ngModel)]="model.email" required
+              pattern="[^@]+@[^@]+\.[a-zA-Z]{2,6}">
+            <mat-error>
+              <ng-container *ngIf="emailControl?.errors?.required">Email is required</ng-container>
+              <ng-container *ngIf="emailControl?.errors?.pattern">Please provide valid email
+              </ng-container>
+              <ng-container *ngIf="emailControl?.errors?.apiError">{{emailControl?.errors?.apiError}}
+              </ng-container>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>CNIC</mat-label>
+            <input matInput #cnic="ngModel" required mask='00000-0000000-0' [showMaskTyped]="true" name="cnic"
+              [(ngModel)]="model.cnic" type="text">
+            <mat-error>
+              <ng-container *ngIf="cnic?.errors?.required">cnic is required</ng-container>
+              <ng-container *ngIf="cnic?.errors && cnic?.errors['Mask error']">Valid cnic of 12 digits
+                is required</ng-container>
+              <ng-container *ngIf="cnic?.errors?.apiError">{{cnic?.errors?.apiError}}</ng-container>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Phone</mat-label>
+            <input matInput #phone="ngModel" required mask='(00)-(000)-0000000' [showMaskTyped]="true" name="phone"
+              [(ngModel)]="model.phone" type="phone">
+            <mat-error>
+              <ng-container *ngIf="phone?.errors?.required">Phone is required</ng-container>
+              <ng-container *ngIf="phone?.errors && phone?.errors['Mask error']">Valid phone of 12 digits
+                is required</ng-container>
+              <ng-container *ngIf="phone?.errors?.apiError">{{phone?.errors?.apiError}}</ng-container>
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <input matInput type={{passwordType}} autocomplete="new-password" placeholder="Password"
+              matTooltip="min 8 Chars (Uppercase, Lowercase, Number)" [matTooltipPosition]="'below'" #password="ngModel"
+              name="password" [(ngModel)]="model.password" [required]="!model?._id">
+            <i title="Show / Hide Password" matSuffix class="fa {{passwordType == 'text' ? 'fa-eye-slash': 'fa-eye'}}"
+              (click)="toggle_password(password);"></i>
+            <mat-error>
+              <ng-container *ngIf="password?.errors?.required">Password is required</ng-container>
+              <ng-container *ngIf="password?.errors?.pattern">Invalid Format: min 8 Chars (Uppercase,
+                Lowercase, Number)</ng-container>
+            </mat-error>
+            <mat-hint *ngIf="model?._id">Only specify to change the password</mat-hint>
+          </mat-form-field>
+          <mat-form-field *ngIf="model?.department?.role" appearance="fill">
+            <mat-label>Department Role</mat-label>
+            <mat-select #userRole="ngModel" [(ngModel)]="model.department.role" name="departmentRole"
+              [compareWith]="compareObjectsRole">
+              <mat-option *ngFor="let role of departmentRoles" [value]="role">
+                {{ role.name }}
+              </mat-option>
+            </mat-select>
+            <mat-error>
+              <ng-container *ngIf="userRole?.errors?.required">Role is required</ng-container>
+            </mat-error>
+          </mat-form-field>
+
+          <app-autocomplete #collegeAuto label="College" [disabled]="false" [selectedValue]="model?.college"
+            placeholder="Search and Select your College" [model]="model" modelBindProp="college"
+            url="{{API_ENDPOINT}}/campuses?ids=all&name=" hint="Leave empty for individual candidate" appearance="fill"
+            showProp="name" bindProp="_id" selectedBindProp="_id">
+          </app-autocomplete>
+
+          <mat-form-field *ngIf="roles && model.role" appearance="fill">
+            <mat-label>Application Level Role</mat-label>
+            <mat-select #userRole="ngModel" [(ngModel)]="model.role" name="role" [compareWith]="compareObjectsRole">
+              <mat-option *ngFor="let role of roles" [value]="role">
+                {{ role.name }}
+              </mat-option>
+            </mat-select>
+            <mat-spinner matSuffix [diameter]="18" *ngIf="waitFor.roles"></mat-spinner>
+            <mat-error>
+              <ng-container *ngIf="userRole?.errors?.required">Role is required</ng-container>
+            </mat-error>
+          </mat-form-field>
+          <div class="top-15">
+            <mat-form-field appearance="fill">
+              <mat-label>Account Status</mat-label>
+              <mat-select #isActive="ngModel" [(ngModel)]="model.accountStatus" name="statusOption">
+                <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+                  {{ status.label }}
+                </mat-option>
+              </mat-select>
+              <mat-checkbox name="notifyApproval" [(ngModel)]="notifyApproval" (click)="$event.stopPropagation()"
+                matSuffix color="primary">Notify
+              </mat-checkbox>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+      <div class="btn-section">
+        <button (click)="goBack();" type="button" mat-stroked-button class="btn-cancel">Cancel</button>
+        <button (click)="saveUser();" mat-raised-button class="btn-save"
+          [disabled]="!UserForm.form.valid">{{selectedId ? 'Update' : 'Save'}}</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+<!-- <pre>
+    {{model|json}}
+</pre> -->

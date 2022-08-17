@@ -1,0 +1,292 @@
+<div class="container-fluid main-secction">
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12 image-section">
+      <img
+        src="http://nicesnippets.com/demo/Nature-Night-Sky-Stars-Blurred-Light-Show-Mountains-WallpapersByte-com-1920x1080.jpg">
+    </div>
+    <div class="row user-left-part">
+      <div class="col-md-2 col-sm-2 col-xs-12 user-profil-part pull-left">
+        <div class="row ">
+          <div class="col-md-12 col-md-12-sm-12 col-xs-12 user-image text-center">
+            <img
+              [src]="model?.avatar || (model?.avatarSrc ? BASE_URL + model?.avatarSrc : 'assets/icons/user-icon.png')">
+          </div>
+          <div class="col-md-12 col-sm-12 col-xs-12 user-detail-section1 text-center">
+            <button class="btn btn-defult follow" (click)="router.navigate(['/users/edit/' + model?._id])"><i
+                class="fa fa-edit" aria-hidden="true"></i> Edit User</button>
+            <button class="btn btn-defult follow" (click)="loadManageNotificationDialog()">
+              <i class="fa fa-bell" aria-hidden="true"></i>
+              Manage Notifications
+            </button>
+          </div>
+
+          <!-- <div class="row user-detail-row">
+
+            <div class="col-md-12 col-sm-12 user-detail-section2 pull-left">
+              <div class="border"></div>
+              <p>
+                Assigned Complaints
+                <i class="fa fa-info-circle" matTooltip="Open complaints assigned to this user"></i>
+              </p>
+              <span>{{stats?.assignedComplaints || 0}}</span>
+            </div>
+
+            <div class="col-md-12 col-sm-12 user-detail-section2 pull-left">
+              <div class="border"></div>
+              <p>
+                On Hold Complaints
+                <i class="fa fa-info-circle" matTooltip="Complaints assigned to this user that are on hold"></i>
+              </p>
+              <span>{{stats?.onHoldComplaints || 0}}</span>
+            </div>
+
+            <div class="col-md-12 col-sm-12 user-detail-section2 pull-left">
+              <div class="border"></div>
+              <p>
+                Waiting Complaints
+                <i class="fa fa-info-circle"
+                  matTooltip="Complaints assigned to this user requiring this user approval"></i>
+              </p>
+              <span>{{stats?.receivedForApprovalComplaints?.receivedForApprovalComplaints || 0}}</span>
+            </div>
+
+            <div class="col-md-12 col-sm-12 user-detail-section2 pull-left">
+              <div class="border"></div>
+              <p>
+                Approved Complaints
+                <i class="fa fa-info-circle"
+                  matTooltip="Complaints assigned to this user which have been approved by the approval authority"></i>
+              </p>
+              <span>{{stats?.approvedComplaints || 0}}</span>
+            </div>
+
+            <div class="col-md-12 col-sm-12 user-detail-section2 pull-left">
+              <div class="border"></div>
+              <p>
+                Resolved Complaints
+                <i class="fa fa-info-circle" matTooltip="Resolved complaints assigned to this user"></i>
+              </p>
+              <span>{{stats?.resolvedComplaints || 0}}</span>
+            </div>
+
+            <div class="col-md-12 col-sm-12 user-detail-section2 pull-left">
+              <div class="border"></div>
+              <p>Rejected Complaints
+                <i class="fa fa-info-circle" matTooltip="Rejected complaints assigned to this user"></i>
+              </p>
+              <span>{{stats?.rejectedComplaints || 0}}</span>
+            </div>
+          </div> -->
+          <div class="col-md-12 user-detail-section2">
+            <div class="border"></div>
+            <p>PERFORMANCE</p>
+            <span>{{stats?.performance | number:'2.1-2'}}% Resolved Cases
+              <!-- <br><small>and 42 review</small> -->
+            </span>
+          </div>
+
+          <div class="col-md-12 col-sm-12 user-detail-section2 pull-left">
+            <div class="border"></div>
+            <p>
+              Submitted Complaints
+              <i class="fa fa-info-circle" matTooltip="Complaints which this user submitted as complainer"></i>
+            </p>
+            <span>{{stats?.submittedComplaints?.submittedComplaints || 0}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-10 col-sm-10 col-xs-12 pull-right profile-right-section">
+        <div class="row profile-right-section-row">
+          <div class="col-md-12 profile-header">
+            <div class="row">
+              <div class="col-md-8 col-sm-6 col-xs-6 profile-header-section1 pull-left">
+                <h1>
+                  {{model?.name | titlecase}}
+                  <span class="sub-title"></span>
+                </h1>
+                <p>{{model?.department?.name}}
+                  <span> - {{model?.department?.role?.name}}</span>
+                </p>
+                <p>+{{model?.phone}}</p>
+              </div>
+              <div class="col-md-4 col-sm-6 col-xs-6 profile-header-section1 text-right pull-rigth">
+                <!-- <button class="btn btn-info req-btn"> REQUEST</button> -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="clearfix"></div>
+            <div class="row">
+              <div class="col-md-12  profile-tag-section text-center">
+
+                <!-- ----------------------------------------------------------------------- -->
+                <!--                              Tabs Headers                               -->
+                <!-- ----------------------------------------------------------------------- -->
+                <div class="row">
+                  <div class="col-md-2 profile-tag" [class.active]="selectedTab == 'contact'"
+                    (click)="setSelectedTab('contact')">
+                    <a><i class="fa fa-address-book" aria-hidden="true"></i></a>
+                    <p>Contact Information</p>
+                  </div>
+                  <div class="col-md-2 profile-tag" [class.active]="selectedTab == 'skills'"
+                    (click)="setSelectedTab('skills')">
+                    <a><i class="fa fa-tags" aria-hidden="true"></i></a>
+                    <p>Skills</p>
+                  </div>
+                  <div class="col-md-2 profile-tag" [class.active]="selectedTab == 'activity-log'"
+                    (click)="setSelectedTab('activity-log')">
+                    <a>
+                      <i class="fa fa-history" aria-hidden="true"></i>
+                    </a>
+                    <p>Activity Log</p>
+                  </div>
+                </div>
+
+                <!-- ----------------------------------------------------------------------- -->
+                <!--                              Tabs Content                               -->
+                <!-- ----------------------------------------------------------------------- -->
+                <div class="row tab-content">
+                  <div class="col-md-12">
+
+                    <ng-container [ngSwitch]="selectedTab">
+
+                      <!-- ------------------------- Contact tab content ------------------------- -->
+                      <ng-container *ngSwitchCase="'contact'">
+
+                        <h6 class="hint">This section includes contact information of this user.</h6>
+                        <mat-form-field appearance="fill" class="control-field">
+                          <mat-label>Email</mat-label>
+                          <input trim="blur" matInput type="email" placeholder="Please provide valid email"
+                            #emailControl="ngModel" name="email" [(ngModel)]="model.email" required
+                            pattern="[^@]+@[^@]+\.[a-zA-Z]{2,6}">
+                          <mat-error>
+                            <ng-container *ngIf="emailControl?.errors?.required">Email is required</ng-container>
+                            <ng-container *ngIf="emailControl?.errors?.pattern">Please provide valid email
+                            </ng-container>
+                            <ng-container *ngIf="emailControl?.errors?.apiError">{{emailControl?.errors?.apiError}}
+                            </ng-container>
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="fill" class="control-field">
+                          <mat-label>Phone</mat-label>
+                          <input matInput #phone="ngModel" required mask='(00)-(000)-0000000' [showMaskTyped]="true"
+                            name="phone" [(ngModel)]="model.phone" type="phone">
+                          <mat-error>
+                            <ng-container *ngIf="phone?.errors?.required">Phone is required</ng-container>
+                            <ng-container *ngIf="phone?.errors && phone?.errors['Mask error']">Valid phone of 12 digits
+                              is required</ng-container>
+                            <ng-container *ngIf="phone?.errors?.apiError">{{phone?.errors?.apiError}}</ng-container>
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field *ngIf="model?.department?.role" class="control-field" appearance="fill">
+                          <mat-label>Department Role</mat-label>
+                          <mat-select [disabled]="true" #userRole="ngModel" [(ngModel)]="model.department.role"
+                            name="departmentRole">
+                            <mat-option *ngFor="let role of departmentRoles" [value]="role">
+                              {{ role.name }}
+                            </mat-option>
+                          </mat-select>
+                          <mat-error>
+                            <ng-container *ngIf="userRole?.errors?.required">Role is required</ng-container>
+                          </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="fill" class="control-field">
+                          <mat-label>Address</mat-label>
+                          <textarea placeholder="Pleae provide your address" matInput #address="ngModel" name="address"
+                            [(ngModel)]="model.address"></textarea>
+                        </mat-form-field>
+
+                        <div class="btn-section">
+                          <button type="button" (click)="reset();" mat-stroked-button class="btn-cancel">Reset</button>
+                          <button type="button" (click)="saveContactInformation();" mat-raised-button
+                            class="btn-save">Save Contact</button>
+                        </div>
+
+                      </ng-container>
+                      <!-- ----------------------- Contact tab content end ----------------------- -->
+
+                      <!-- ------------------------- Skills ------------------------- -->
+                      <ng-container *ngSwitchCase="'skills'">
+
+                        <h6 class="hint">
+                          This shows that the user has capability to resolve what kind of complaint categories/types.
+                        </h6>
+                        <div *ngFor="let category of model?.skillCategories;let i=index;" class="line-item">
+                          <div class="line-item-header">
+                            <label></label>
+                            <i *ngIf="model?.skillCategories?.length > 1" (click)="removeLineItemCategory(i)"
+                              matTooltip="Remove category/types selection" class="fa fa-trash"></i>
+                          </div>
+                          <!-- <app-department-category-type-select
+                            *ngIf="categoryTypesSelectConfigs[i] && categoryTypesSelectConfigs[i]?.departmentId"
+                            [checkDuplicateRecords]="model.skillCategories" [config]="categoryTypesSelectConfigs[i]">
+                          </app-department-category-type-select> -->
+                        </div>
+
+
+                        <div class="btn-section">
+                          <button mat-raised-button (click)="addLineItemCategory()" class="btn-save">Another
+                            Category</button>&nbsp;
+                          <button type="button" (click)="reset();" mat-stroked-button class="btn-cancel">Reset</button>
+                          <button type="button" (click)="saveContactInformation();" mat-raised-button
+                            class="btn-save">Save Skills</button>
+                        </div>
+
+                      </ng-container>
+                      <!-- ----------------------- Skills end ----------------------- -->
+
+                      <!-- ----------------------- Related complaints end ----------------------- -->
+
+                      <!-- ------------------------- Activity log complaints ------------------------- -->
+                      <ng-container *ngSwitchCase="'activity-log'">
+                        <h6 class="hint">
+                          This section includes the activity logs for the user related to complaints.
+                        </h6>
+                        <!-- <activity-logs-list [config]="{userId: model?._id, related: true}"></activity-logs-list> -->
+                      </ng-container>
+                      <!-- ----------------------- Activity log end ----------------------- -->
+
+                    </ng-container>
+
+                  </div>
+                </div>
+              </div>
+              <!-- --------------------------------- -- ---------------------------------- -->
+              <!-- --------------------------------- -- ---------------------------------- -->
+
+              <!-- <div class="col-md-3 img-main-rightPart">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="row image-right-part">
+                      <div class="col-md-6 pull-left image-right-detail">
+                        <p>TODAYHIGHLIGHT</p>
+                      </div>
+                      <div class="col-md-6 pull-right image-right-detail text-right">
+                        <span><a>more</a></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 image-right">
+                    <img
+                      src="http://nicesnippets.com/demo/Nature-Night-Sky-Stars-Blurred-Light-Show-Mountains-WallpapersByte-com-1920x1080.jpg">
+                  </div>
+                  <div class="col-md-12 image-right-detail-section2">
+                    <p>Urban planning consulation</p>
+                    <span>Lorem ipsum dolor sit amet, consectetur adipisibj.</span>
+                  </div>
+                </div>
+              </div> -->
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ngx-spinner [fullScreen]="false" bdColor="rgba(51,51,51,0.8)" color="#fff" type="timer" title="Click to hide"
+  (click)="spinner.hide()"></ngx-spinner>

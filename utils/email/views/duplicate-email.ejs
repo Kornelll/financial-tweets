@@ -1,0 +1,33 @@
+<html>
+
+<head>
+    <style>
+        body {
+            padding: 10%;
+        }
+        .card-2 {
+            padding: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+        }
+    </style>
+</head>
+
+<body>
+    <h3>Following are the duplicate emails generated after daily R2D2 import:</h3>
+    <h4>Date & Time: <%= date %></h4>
+    <h5>Total: <%= emails.length %></h5>
+    <% for(var i=0; i<emails.length; i++) {%>
+        <div class="card card-2">
+            <h4>
+                <%= emails[i].email %>
+            </h4>
+            <p>
+                <a href="<%= urlPrefix %><%= emails[i].user1 %>"><%= urlPrefix %><%= emails[i].user1 %></a>
+            </p>
+            <p>
+                <a href="<%= urlPrefix %><%= emails[i].user2 %>"><%= urlPrefix %><%= emails[i].user2 %></a>
+            </p>
+        </div>
+    <% } %>
+</body>
+</html>

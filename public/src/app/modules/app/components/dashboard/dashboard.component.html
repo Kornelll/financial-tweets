@@ -1,0 +1,10 @@
+<div class="container">
+    <div class="row">
+        <div (mouseenter)="card.animate=true" (mouseleave)="card.animate=false" [class.bounce]="card.animate" (click)="cardClicked(card)" class="animated col text-center mat-card" *ngFor="let card of dashboardService.dashboardCards">
+            <img height="200"
+                [src]="card.imgSrc">
+            <h4>{{card.title}}</h4>
+        </div>
+
+    </div>
+</div>

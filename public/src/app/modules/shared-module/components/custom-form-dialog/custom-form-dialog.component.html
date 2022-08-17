@@ -1,0 +1,362 @@
+<div class="main-container-1">
+    <h1 class="title">
+        <i class="success fa fa-check-circle" *ngIf="dialogType == 'success'"></i>
+        <i class="red fa fa-times-circle" *ngIf="dialogType == 'error'"></i>
+        <i class="info-icon fa fa-info-circle" *ngIf="dialogType == 'info'"></i>
+        <i class="warn fa fa-exclamation-triangle" *ngIf="dialogType == 'warn' || dialogRole == 'confirm'"></i>
+        {{title}} {{showPoropAtTitlePrefix || ''}}{{valueModel ? (valueModel[showPropAtTitle] || '') : '' }}
+    </h1>
+    <h6 *ngIf="subTitle" [class.scroll-container-dialog]="dialogRole == 'info'" [innerHTML]="subTitle | safeHtml"></h6>
+    <ng-container *ngIf="dialogRole == 'form'">
+        <form #form1="ngForm">
+            <div class="scroll-container-dialog">
+                <ng-container *ngFor="let m of model; let i=index;">
+                    <ng-container *ngIf="!m.isArray">
+                        <ng-container *ngTemplateOutlet="formItem; context: {m: m, i: i, valueModel: valueModel}">
+                        </ng-container>
+                    </ng-container>
+                    <ng-container *ngIf="m.isArray">
+                        <ng-container *ngFor="let mm of arrayModels[m.name]; let jj=index">
+                            <ng-container
+                                *ngTemplateOutlet="formItem; context: {m: mm, i: i, j:jj, valueModel: valueModel}">
+                            </ng-container>
+                        </ng-container>
+
+                        <ng-container
+                            *ngIf="!m.ifField || (m.ifField && ((m.ifFieldPresent && valueModel[m.ifField]) || (!m.ifFieldPresent && !valueModel[m.ifField])))">
+                            <button type="button" class="btn-save" mat-raised-button (click)="addMoreArrayItem(m)">
+                                Add More
+                            </button>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </div>
+            <h1 class="error" *ngIf="err">
+                {{err?.error?.message}}
+            </h1>
+            <div class="btn-section">
+                <button type="button" (click)="cancel();" mat-stroked-button class="btn-cancel">Cancel</button>
+                <button type="button" [disabled]="!form1.form.valid" (click)="submit();" mat-raised-button
+                    class="btn-save">{{saveBtnTxt ? saveBtnTxt : (updateMode ? 'Update' : 'Save')}}</button> &nbsp;
+                <button type="button" [disabled]="!form1.form.valid" *ngIf="(!updateMode && addMoreButton)"
+                    (click)="submit(true);" mat-raised-button class="btn-save">Save & Add Another</button> &nbsp;
+
+                <button type="button" *ngIf="dontShowAgainBtnTxt" (click)="dontShowAgainBtnClicked();" mat-raised-button
+                    class="btn-save">{{dontShowAgainBtnTxt}}</button>
+
+                <mat-spinner *ngIf="!err && waiting"
+                    style="margin-top: -35px;width: 30px;height: 30px;margin-left: 150px;" [diameter]="30">
+                </mat-spinner>
+            </div>
+        </form>
+    </ng-container>
+    <ng-container *ngIf="dialogRole == 'confirm'">
+        <br>
+        <button (click)="cancel();" mat-raised-button tabindex="2"
+            class="btn-cancel">{{cancelBtnTxt ? cancelBtnTxt : 'No'}}</button>
+        <button (click)="submit();" autofocus tabindex="1" mat-raised-button
+            class="btn-confirm">{{saveBtnTxt ? saveBtnTxt : 'Yes'}}</button>
+    </ng-container>
+    <ng-container *ngIf="dialogRole == 'info'">
+        <br>
+        <button style="float: right;" (click)="cancel();" mat-raised-button
+            class="btn-confirm">{{saveBtnTxt ? saveBtnTxt : 'OK'}}</button>
+    </ng-container>
+</div>
+
+<ng-template #formItem let-m="m" let-i="i" let-j="j" let-valueModel="valueModel">
+    <div>
+        <ng-container *ngIf="!m.ifField || (m.ifField && (
+                ((m.ifFieldPresent && valueModel[m.ifField] && m.ifFieldValue && m.ifFieldValue == valueModel[m.ifField]) || (m.ifFieldPresent && valueModel[m.ifField] && !m.ifFieldValue))
+                || 
+                (!m.ifFieldPresent && !valueModel[m.ifField])
+                ))">
+            <ng-container *ngIf="!m.ifField2 || (m.ifField2 && (
+                ((m.ifField2Present && valueModel[m.ifField2] && m.ifField2Value && m.ifField2Value == valueModel[m.ifField2]) || (m.ifField2Present && valueModel[m.ifField2] && !m.ifField2Value))
+                || 
+                (!m.ifField2Present && !valueModel[m.ifField2])
+                ))">
+                <div [ngSwitch]="m.type">
+                    <mat-form-field *ngSwitchCase="'text'">
+                        <input #inputText="ngModel" maxlength="{{m.maxlength || infinity}}"
+                            (blur)="trimValue(m, inputText)" (input)="checkValidations(m, inputText)" autocomplete="off"
+                            [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)" [required]="m.required"
+                            matInput [(ngModel)]="valueModel[m.name]" [name]="m.name"
+                            [placeholder]="(m.placeholder || m.name) " [matTooltip]="m.tooltip" />
+                        <mat-hint align="end">
+                            <ng-container *ngIf="m.maxlength">{{inputText.value?.length || 0}} / {{m.maxlength}}
+                            </ng-container>
+                            {{m.hint}}
+                        </mat-hint>
+                        <mat-error>
+                            <ng-container *ngIf="inputText?.errors?.required">{{(m.placeholder || m.name)}} is required.
+                            </ng-container>
+                            <ng-container *ngIf="inputText?.errors?.duplicate">{{(m.placeholder || m.name)}} already
+                                exists.
+                            </ng-container>
+                        </mat-error>
+                        <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                            {{err?.error?.errors[m.name].message}}
+                        </span>
+                    </mat-form-field>
+
+                    <mat-form-field *ngSwitchCase="'email'">
+                        <input type="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
+                            [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)" [required]="m.required"
+                            matInput [(ngModel)]="valueModel[m.name]" [name]="m.name"
+                            [placeholder]="(m.placeholder || m.name) " [matTooltip]="m.tooltip" />
+
+                        <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                            {{err?.error?.errors[m.name].message}}
+                        </span>
+                    </mat-form-field>
+
+                    <mat-form-field *ngSwitchCase="'number'">
+                        <input #inputText="ngModel" type="number"
+                            [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)"
+                            (input)="checkValidations(m, inputText)" [required]="m.required" matInput
+                            [(ngModel)]="valueModel[m.name]" [name]="m.name" [min]="0"
+                            [placeholder]="(m.placeholder || m.name)" [matTooltip]="m.tooltip" />
+
+                        <mat-error>
+                            <ng-container *ngIf="inputText?.errors?.required">{{(m.placeholder || m.name)}} is required.
+                            </ng-container>
+                            <ng-container *ngIf="inputText?.errors?.duplicate">{{(m.placeholder || m.name)}} already
+                                exists.
+                            </ng-container>
+                        </mat-error>
+                        <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                            {{err?.error?.errors[m.name].message}}
+                        </span>
+                        <span *ngIf="m.suffixLabel" matSuffix>{{m.suffixLabel}}</span>
+                        <mat-hint>{{m.hint}}</mat-hint>
+                    </mat-form-field>
+
+                    <mat-form-field *ngSwitchCase="'time'" style="width: 98%;">
+                        <input #inputText="ngModel" type="time"
+                            [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)"
+                            (input)="checkValidations(m, inputText)" [required]="m.required" matInput
+                            [(ngModel)]="valueModel[m.name]" [name]="m.name" [min]="0"
+                            [placeholder]="(m.placeholder || m.name)" [matTooltip]="m.tooltip" />
+
+                        <mat-error>
+                            <ng-container *ngIf="inputText?.errors?.required">{{(m.placeholder || m.name)}} is required.
+                            </ng-container>
+                            <ng-container *ngIf="inputText?.errors?.duplicate">{{(m.placeholder || m.name)}} already
+                                exists.
+                            </ng-container>
+                        </mat-error>
+                        <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                            {{err?.error?.errors[m.name].message}}
+                        </span>
+
+                        <mat-hint>{{m.hint}}</mat-hint>
+                    </mat-form-field>
+
+                    <mat-form-field *ngSwitchCase="'password'">
+                        <input #inputText="ngModel" maxlength="{{m.maxlength || infinity}}"
+                            type="{{m['showPassword'] ? 'text' : 'password'}}"
+                            [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)" [required]="m.required"
+                            matInput [(ngModel)]="valueModel[m.name]" [name]="m.name"
+                            [placeholder]="(m.placeholder || m.name)" [matTooltip]="m.tooltip" />
+                        <i matSuffix class="fa fa-eye{{m['showPassword'] ? '-slash':''}}"
+                            (click)="m['showPassword'] = !m['showPassword']"></i>
+                        <mat-error>
+                            <ng-container *ngIf="inputText?.errors?.required">{{(m.placeholder || m.name)}} is required.
+                            </ng-container>
+                            <ng-container *ngIf="inputText?.errors?.duplicate">{{(m.placeholder || m.name)}} already
+                                exists.
+                            </ng-container>
+                        </mat-error>
+                        <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                            {{err?.error?.errors[m.name].message}}
+                        </span>
+                    </mat-form-field>
+
+                    <mat-form-field *ngSwitchCase="'date'" (click)="picker.open()">
+                        <input autocomplete="off" *ngIf="valueModel[m.name] != 'present'"
+                            [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)"
+                            [required]="m.required && valueModel[m.name] != 'present'" matInput
+                            [(ngModel)]="valueModel[m.name]" [matDatepicker]="picker" [name]="m.name"
+                            [placeholder]="(m.placeholder || m.name)" [matTooltip]="m.tooltip">
+                        <input *ngIf="valueModel[m.name] == 'present'" matInput [(ngModel)]="valueModel[m.name]"
+                            [name]="m.name" [placeholder]="(m.placeholder || m.name) ">
+                        <i *ngIf="valueModel[m.name]" (click)="valueModel[m.name] = null" class="fa fa-times"
+                            matSuffix></i>
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                        <mat-hint>{{m.hint}}</mat-hint>
+                        <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                            {{err?.error?.errors[m.name].message}}
+                        </span>
+                    </mat-form-field>
+                    
+                    <mat-form-field *ngSwitchCase="'datetime'">
+                        <input type="datetime-local" autocomplete="off" *ngIf="valueModel[m.name] != 'present'"
+                            [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)"
+                            [required]="m.required && valueModel[m.name] != 'present'" matInput
+                            [(ngModel)]="valueModel[m.name]" [name]="m.name"
+                            [placeholder]="(m.placeholder || m.name)" [matTooltip]="m.tooltip">
+                        <mat-hint>{{m.hint}}</mat-hint>
+                        <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                            {{err?.error?.errors[m.name].message}}
+                        </span>
+                    </mat-form-field>
+
+                    <div *ngSwitchCase="'hidden'">
+                        <input type="hidden" autocomplete="off" *ngIf="valueModel[m.name] != 'present'"
+                            [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)"
+                            [required]="m.required && valueModel[m.name] != 'present'"
+                            [(ngModel)]="valueModel[m.name]" [name]="m.name"
+                            [placeholder]="(m.placeholder || m.name)" [matTooltip]="m.tooltip">
+                        <mat-hint>{{m.hint}}</mat-hint>
+                        <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                            {{err?.error?.errors[m.name].message}}
+                        </span>
+                    </div>
+
+                    <mat-form-field *ngSwitchCase="'textarea'">
+                        <textarea #inputText="ngModel" [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)"
+                            [required]="m.required" [(ngModel)]="valueModel[m.name]" matInput [name]="m.name"
+                            [placeholder]="(m.placeholder || m.name)" [matTooltip]="m.tooltip"></textarea>
+                        <mat-error>
+                            <ng-container *ngIf="inputText?.errors?.required">{{(m.placeholder || m.name)}} is required.
+                            </ng-container>
+                        </mat-error>
+                        <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                            {{err?.error?.errors[m.name].message}}
+                        </span>
+                    </mat-form-field>
+
+                    <mat-form-field *ngSwitchCase="'select'">
+                        <mat-select [multiple]="m.multiple" #selectControl="ngModel" *ngIf="!selectOther[m.name]"
+                            [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)" [required]="m.required"
+                            [ngModel]="m.isArray ? valueModel[m.name][j] : valueModel[m.name]"
+                            (ngModelChange)="m.isArray ? valueModel[m.name][j] = $event : valueModel[m.name] = $event; checkIfRequired(m, i)"
+                            [name]="m.name + (i) + (j)" [placeholder]="(m.placeholder || m.name) + ' ' + (j ? j+1 : '')"
+                            [compareWith]="compareObjects" [matTooltip]="m.tooltip">
+                            <mat-option [value]="null" *ngIf="m.hasNone">None</mat-option>
+                            <mat-option *ngFor="let op of externalData[m.name]"
+                                [value]="m.bindField ? (op | dotfield:m.bindField) : op">
+                                {{m.showField ? op[m.showField] : op}}
+                                <ng-container *ngIf="m.showField2">
+                                    {{m.showField2Prefix || ''}}
+                                    {{op|dotfield:m.showField2}}
+                                </ng-container>
+                                <ng-container *ngIf="m.showField3">
+                                    {{m.showField3Prefix || ''}}
+                                    {{op|dotfield:m.showField3}}
+                                </ng-container>
+                                <ng-container *ngIf="m.showField4">
+                                    {{m.showField4Prefix || ''}}
+                                    {{op|dotfield:m.showField4}}
+                                </ng-container>
+                                {{m.selectSuffix ? m.selectSuffix : ''}}
+                            </mat-option>
+                        </mat-select>
+                        <ng-container *ngIf="m.multiple">
+                            <span matSuffix class="link" (click)="multiselectAction(m, 1)">All</span> |
+                            <span matSuffix class="link" (click)="multiselectAction(m, 2)">None</span>
+                        </ng-container>
+                        <input #otherSelect name="careerOther_{{m.name}}" [(ngModel)]="valueModel[m.name + '_other']"
+                            [placeholder]="(m.placeholder || m.name) " matInput *ngIf="selectOther[m.name]">
+                        <mat-checkbox [disabled]="m.disabled" *ngIf="m.hasOther" matSuffix
+                            (change)="selectOtherToggle($event, m.name);" [(ngModel)]="selectOther[m.name]"
+                            name="checkboxOther_{{m.name}}">Other</mat-checkbox>
+
+                        <i matSuffix class="fa fa-trash" matTooltip="Remove" *ngIf="m.isArray"
+                            (click)="removeArrayModel(m, j, $event)"></i>
+
+                        <mat-error>
+                            {{(m.placeholder || m.name)}} is required.
+                        </mat-error>
+                        <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                            {{err?.error?.errors[m.name].message}}
+                        </span>
+                        <mat-hint>{{m.hint}}</mat-hint>
+                    </mat-form-field>
+
+                    <div *ngSwitchCase="'checkbox'" class="checkbox-field">
+                        <mat-checkbox #inputText="ngModel"
+                            [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)" [required]="m.required"
+                            matInput [(ngModel)]="valueModel[m.name]" [name]="m.name" [matTooltip]="m.tooltip">
+                            {{m.placeholder || m.name}}
+                        </mat-checkbox>
+                        <mat-error>
+                            <ng-container *ngIf="inputText?.errors?.required">{{(m.placeholder || m.name)}} is required.
+                            </ng-container>
+                            <ng-container *ngIf="inputText?.errors?.duplicate">{{(m.placeholder || m.name)}} already
+                                exists.
+                            </ng-container>
+                        </mat-error>
+                        <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                            {{err?.error?.errors[m.name].message}}
+                        </span>
+                    </div>
+
+                    <ng-container *ngSwitchCase="'color'">
+                        <div class="color-field">
+                            <mat-form-field>
+                                <input type="text" #inputText="ngModel" matInput [(ngModel)]="valueModel[m.name]"
+                                    [name]="m.name" [placeholder]="(m.placeholder || m.name)"
+                                    [matTooltip]="m.tooltip" />
+                            </mat-form-field>
+                            <mat-form-field>
+                                <input type="color" #inputText="ngModel" matInput [(ngModel)]="valueModel[m.name]"
+                                    [name]="m.name" />
+                                <i matTooltip="Randomize color" (click)="randomizeColor(m)" class="fa fa-random"
+                                    matSuffix></i>
+                                <mat-error>
+                                    <ng-container *ngIf="inputText?.errors?.required">
+                                        {{(m.placeholder || m.name)}} is required.
+                                    </ng-container>
+                                </mat-error>
+                                <span class="error" *ngIf="err?.error?.errors && err?.error?.errors[m.name]">
+                                    {{err?.error?.errors[m.name].message}}
+                                </span>
+                            </mat-form-field>
+                        </div>
+                    </ng-container>
+
+                    <div class="editor-field" *ngSwitchCase="'quill-editor'">
+                        <quill-editor [(ngModel)]="valueModel[m.name]" [name]="m.name" #inputText="ngModel"
+                            [disabled]="m.disabled || (updateMode && m.disabledWhenUpdate)" [required]="m.required">
+                        </quill-editor>
+                    </div>
+
+                    <div class="editor-field" *ngSwitchCase="'file'">
+                        <a *ngIf="valueModel[m.name]" href="{{BASE_URL}}{{valueModel[m.name]}}" target="_blank">View
+                            Attached Document</a>
+                        <upload-documents #mFileUploader (upload)="onFileUploaded($event, m)"
+                            [config]="{showLabels: m.documentOptions.showLabels, maxFileSize: m.documentOptions.maxFileSize, fetch: m.documentOptions.fetch, queueLimit: m.documentOptions.queueLimit, filesLimit: m.documentOptions.filesLimit, allowedFileType: m.documentOptions.allowedFileType}">
+                        </upload-documents>
+                        <mat-hint *ngIf="valueModel[m.name]">Re-upload if you want it get overwritten</mat-hint>
+                    </div>
+
+                    <div class="editor-field" *ngSwitchCase="'cropper'">
+                        <h6>{{m.placeholder || m.name}} <span class="red" *ngIf="m.required">[required]</span>:
+                            (.png|.jpg|.jpeg|.gif)</h6>
+                        <img style="width: 75px;height: auto;margin-right: 10px;position: initial;"
+                            [src]="valueModel[m.name] || (valueModel[m.name + 'Src'] ? BASE_URL + valueModel[m.name + 'Src'] : 'assets/icons/photo-512.png')"
+                            alt="Avatar" class="avatar">
+                        <button type="button" (click)="selectAvatar(m);" class="btn btn-primary">Browse</button>
+                    </div>
+
+                    <div class="editor-field" *ngSwitchCase="'radio'">
+                        <mat-button-toggle-group #group="matButtonToggleGroup" [required]="m.required" [name]="m.name"
+                            [(ngModel)]="valueModel[m.name]">
+                            <mat-button-toggle *ngFor="let op of externalData[m.name]"
+                                [value]="m.bindField ? op[m.bindField] : op">
+                                <div class="radio-content">
+                                    {{m.showField ? op[m.showField] : op}} {{m.selectSuffix ? m.selectSuffix : ''}}
+                                    <mat-icon *ngIf="op.icon">{{op.icon}}</mat-icon>
+                                </div>
+                            </mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </div>
+                    <!-- <some-element *ngSwitchDefault>...</some-element> -->
+                </div>
+            </ng-container>
+        </ng-container>
+    </div>
+</ng-template>

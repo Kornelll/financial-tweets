@@ -1,0 +1,10 @@
+<ng-container *ngIf="!isIframe">
+    <router-outlet></router-outlet>
+</ng-container>
+
+<ng-container *ngIf="isIframe">
+    <h4 class="error">Note: Please do not use third party softwares or Information platforms to apply online.</h4>
+    <h1>
+        <a href="https://examinations.su.edu.pk" target="_blank">Click here to Apply Online on SU Website</a></h1>
+    <h5 class="fs-11"><a target="_blank" href="https://facebook.com/amaneer94">Aman Ullah</a>, Computer Programmer. WDC, University of Sargodha</h5>
+</ng-container>

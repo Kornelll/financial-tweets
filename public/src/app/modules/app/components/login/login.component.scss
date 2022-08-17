@@ -1,0 +1,248 @@
+$primary-color: #0059b8;
+$transition: 0.3s;
+$font-size: 16px; // Change value to scale
+
+main {
+  height: 100vh;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.error-msg {
+  color: #d4caca;
+  background: #ff000045;
+  width: 100%;
+  padding: 3px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.c-form {
+  // font-family: "Montserrat", sans-serif;
+  font-size: $font-size;
+  color: #fff;
+  position: relative;
+  max-width: 28em;
+  height: fit-content;
+  // height: -webkit-fill-available;
+  margin: auto;
+  padding: 1.5em 2em 0;
+  background-color: $primary-color;
+  box-shadow: 0 8px 17px 2px rgba(black, 0.14), 0 3px 14px 2px rgba(black, 0.12), 0 5px 5px -3px rgba(black, 0.2);
+}
+
+.c-form__fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.c-form__title {
+  text-align: center;
+  font-weight: 600;
+
+  img {
+    width: 90px;
+    height: auto;
+    cursor: pointer;
+  }
+
+  label {
+    vertical-align: -webkit-baseline-middle;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 20px;
+  }
+}
+
+.c-formGroup {
+  display: block;
+  height: 3em;
+  position: relative;
+  cursor: pointer;
+}
+
+.c-formGroup__icon {
+  color: darkgrey;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3em;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0.5);
+  transform-origin: center bottom;
+  pointer-events: none;
+  opacity: 0;
+  transition: transform $transition, opacity $transition;
+}
+
+.c-formGroup__input {
+  --focus-color: #fff;
+  --active-color: #d6d6d6;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 0;
+  padding: 0 1em 0 3em;
+  outline: 0;
+  border: 0.15em solid transparent;
+  border-radius: 0.4em;
+  font: inherit;
+  font-weight: 700;
+  color: #585858;
+  background-color: var(--focus-color);
+  box-sizing: border-box;
+  cursor: pointer;
+  pointer-events: none;
+  box-shadow: 0 2px 2px 0 rgba(black, 0.14), 0 3px 1px -2px rgba(black, 0.12), 0 1px 5px 0 rgba(black, 0.2);
+  transition: height $transition, background 0.8s; // used by .u-ripple
+
+  &::placeholder {
+    opacity: 1;
+  }
+
+  &:focus,
+  &:not(:placeholder-shown) {
+    pointer-events: initial;
+    cursor: text;
+    height: 100%;
+    box-shadow: 0 4px 5px 0 rgba(black, 0.14), 0 1px 10px 0 rgba(black, 0.12), 0 2px 4px -1px rgba(black, 0.3);
+
+    &~.c-formGroup__icon {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    &~.c-formGroup__title {
+      top: -53%;
+      opacity: 0.7;
+      font-size: 20px;
+    }
+  }
+}
+
+.c-formGroup__title {
+  position: absolute;
+  top: 40%;
+  margin-left: 0.25em;
+  font-size: 0.9em;
+  font-weight: 400;
+  transition: top $transition, font-size $transition;
+}
+
+.c-form__link {
+  text-decoration: none;
+  font-size: 15px;
+  color: rgb(247, 247, 247);
+  outline: 0;
+  cursor: pointer;
+}
+
+.c-form__link:hover {
+  text-decoration: underline !important;
+}
+
+.c-form__button {
+  --focus-color: #{darken($primary-color, 5)};
+  --active-color: #{lighten($primary-color, 1)};
+  font: inherit;
+  font-size: 1.2em;
+  font-weight: 600;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3em;
+  border: 0;
+  outline: 0;
+  color: inherit;
+  cursor: pointer;
+  background-color: var(--focus-color);
+  transition: background 0.8s; // used by .u-ripple
+}
+
+.c-form__button:disabled {
+  background: #cccdce57;
+  color: #d0cfcf;
+}
+
+.u-spacer {
+  height: 3em;
+}
+
+.u-spacer-recaptcha {
+  height: 1em;
+}
+
+.mb-30 {
+  margin-bottom: 30px;
+}
+
+.mb {
+  margin-bottom: 40px;
+}
+
+.u-spacer--sm {
+  height: 2em;
+}
+
+.u-spacer--sm:last-child {
+  margin-bottom: 40px;
+}
+
+.u-ripple {
+  background-position: center;
+
+  &:hover:not(:disabled) {
+    background: var(--focus-color) radial-gradient(circle, transparent 1%, var(--focus-color) 1%) center/15000%;
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--active-color);
+    background-size: 100%;
+    transition: background 0s;
+  }
+}
+
+:disabled {
+  cursor: default;
+}
+
+// Styles below for demonstration purposes only
+body {
+  .c-form {
+    display: block;
+    margin: 100px auto 0;
+  }
+}
+
+.links a {
+  color: white;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.bg-anim {
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}

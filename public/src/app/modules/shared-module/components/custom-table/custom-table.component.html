@@ -1,0 +1,284 @@
+<ng-container *ngIf="config">
+
+    <div class="content-header" *ngIf="config?.title">
+        <h3>
+            <label>
+                {{config?.title}}
+            </label>
+        </h3>
+    </div>
+    <h6 *ngIf="config?.subTitle" class="content-subheader">
+        {{config?.subTitle}}
+    </h6>
+
+    <ng-container>
+        <ng-container *ngIf="config?.addButton?.permissions;else btnFlatFab">
+            <ng-container *ifRole="config?.addButton?.permissions">
+                <ng-container *ngTemplateOutlet="btnFlatFab"></ng-container>
+            </ng-container>
+        </ng-container>
+        <ng-template #btnFlatFab>
+            <button class="btn-save" style="margin-top: 10px;margin-bottom: 10px;"
+                *ngIf="config?.addButton && (config?.addButton?.position || config?.addButton?.position == 'inline')"
+                mat-raised-button color="primary" [matTooltip]="config?.addButton?.tooltip" (click)="onFabClicked()">
+                {{config?.addButton?.title}}
+            </button>
+        </ng-template>
+    </ng-container>
+
+    <!-- START -->
+    <ng-container *ngFor="let selectFilter of config?.selectFilters;let selectFilterIndex">
+        <mat-form-field appearance="fill">
+            <mat-select [multiple]="selectFilter.multiple" #selectControl="ngModel" [disabled]="selectFilter.disabled"
+                [required]="selectFilter.required" [ngModel]="selectFilter.valueModel"
+                (ngModelChange)="selectFilter.valueModel = $event; this.paginator.firstPage(); fetchData()"
+                name="selectFilter.name" [placeholder]="(selectFilter.placeholder)" [compareWith]="compareObjects"
+                [matTooltip]="selectFilter.tooltip">
+                <mat-option [value]="null" *ngIf="selectFilter.hasNone">None</mat-option>
+                <mat-option *ngFor="let op of selectFilter.externalData"
+                    [value]="selectFilter.bindField ? op[selectFilter.bindField] : op">
+                    {{selectFilter.showField ? op[selectFilter.showField] : op}}
+                    <ng-container *ngIf="selectFilter.showField2">
+                        {{op[selectFilter.showField2]}}
+                    </ng-container>
+                    <ng-container *ngIf="selectFilter.showField3">
+                        {{op[selectFilter.showField3]}}
+                    </ng-container>
+                    {{selectFilter.selectSuffix ? selectFilter.selectSuffix : ''}}
+                </mat-option>
+            </mat-select>
+
+            <mat-error>
+                {{(selectFilter.placeholder || selectFilter.name)}} is required.
+            </mat-error>
+            <mat-hint>{{selectFilter.hint}}</mat-hint>
+        </mat-form-field>
+    </ng-container>
+    <!-- END -->
+
+    <mat-form-field *ngIf="config?.customSearch" appearance="fill">
+        <mat-label>Search</mat-label>
+        <input #searchControl [formControl]="serachControl" autocomplete="off" matInput
+            [placeholder]="config?.customSearch?.placeholder || ''" />
+        <i matSuffix *ngIf="searchControl.value" (click)="serachControl.setValue('')" class="fa fa-times-circle"></i>
+    </mat-form-field>
+
+    <mat-checkbox class="query-checkbox" (change)="onUrlCheckboxChanged(queryCheckbox)" name="queryCheckbox_{{iii}}"
+        [(ngModel)]="queryCheckbox.value" *ngFor="let queryCheckbox of config?.urlCheckboxs;let iii=index">
+        {{queryCheckbox.title}}
+    </mat-checkbox>
+
+    <div style="padding-bottom: 100px;">
+        <table mat-table matSort [dataSource]="dataSource" class="mat-elevation-z8xxx" [multiTemplateDataRows]=true>
+            <ng-container *ngFor="let colDef of displayedColumns">
+                <!-- Checkbox Column -->
+                <ng-container *ngIf="colDef == 'select'" matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox (change)="$event ? masterToggle() : null"
+                            [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                        </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-checkbox #checkboxRow (click)="$event.stopPropagation()"
+                            (change)="$event ? toggleSelection(row) : null" [checked]="selection.isSelected(row)"
+                            [aria-label]="checkboxLabel(row)">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+
+                <ng-container [matColumnDef]="colDef" *ngIf="colDef != 'select' && colDef != 'actions';">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                        {{model[colDef].title | titlecase}}&nbsp;
+                        <i class="fa fa-filter" *ngIf="!model[colDef].disableFilter"
+                            [matTooltip]="model[colDef].filter ? 'Hide filter input field' : 'Show filter input field'"
+                            [style.color]="model[colDef].value ? '#0879fa' : '#757575'"
+                            (click)="model[colDef].filter=!model[colDef].filter; $event.stopPropagation();filterToggleIconClicked(model, colDef)"></i>&nbsp;
+                        <mat-form-field *ngIf="model[colDef].filter" (click)="$event.stopPropagation()"
+                            floatLabel="never">
+                            <input id="filterInput_{{colDef}}" name='filterInput_{{colDef}}'
+                                [disabled]="model[colDef].inputDisabled" [ngModel]='model[colDef].value' autofocus
+                                (ngModelChange)='changed($event, colDef)' #filterField autocomplete="off" matInput
+                                placeholder="Filter">
+                            <i *ngIf="filterField.value && !model[colDef].inputDisabled"
+                                (click)="model[colDef].value = '';changed('', colDef)" class="fa fa-times" matSuffix
+                                matTooltip="Clear value"></i>
+                        </mat-form-field>
+                    </th>
+                    <td mat-cell *matCellDef="let element; let ii = dataIndex;" style="word-break: break-word;">
+                        <ng-container *ngIf="!model[colDef].projection || model[colDef].projection == 'text'">
+                            {{element | dotfield:colDef}}
+                        </ng-container>
+                        <ng-container *ngIf="model[colDef].projection == 'serial'">
+                            {{1 + ii}}
+                        </ng-container>
+                        <ng-container *ngIf="model[colDef].projection == 'boolean'">
+                            {{(element | dotfield:colDef) ? (model[colDef].trueTitle || 'Yes') :
+                            (model[colDef].falseTitle || 'No')}}
+                        </ng-container>
+                        <ng-container *ngIf="model[colDef].projection == 'array'">
+                            {{(element | dotfield:colDef)}}
+                        </ng-container>
+                        <ng-container *ngIf="model[colDef].projection == 'showFields'">
+                            <ng-container *ngIf="element.show;else showRef;">
+                                <button mat-stroked-button (click)="element.show = false" style="margin-top: 10px;"
+                                    class="btn btn-save">Hide</button><br>
+                                {{(element | dotfield:colDef) |
+                                showFields:model[colDef].showFields:(model[colDef].showFieldsSaperator ||
+                                ''):(model[colDef].itemSaperator || '')}}
+                            </ng-container>
+                            <ng-template #showRef>
+                                <button mat-stroked-button (click)="element.show = true"
+                                    class="btn btn-save">Show</button>
+                            </ng-template>
+                        </ng-container>
+                        <ng-container *ngIf="model[colDef].projection == 'image'">
+                            <img class="avatar-img"
+                                [src]="(element | dotfield:colDef) ? BASE_URL+(element | dotfield:colDef) : 'assets/icons/photo-512.png'" />
+                        </ng-container>
+                        <ng-container *ngIf="model[colDef].projection == 'dateOnly'">
+                            {{(element | dotfield:colDef | date:'dd/MM/yyyy')}}
+                        </ng-container>
+                        <ng-container *ngIf="model[colDef].projection == 'datetime'">
+                            {{(element | dotfield:colDef | date:'dd/MM/yyyy hh:mm:ss a')}}
+                        </ng-container>
+                        <ng-container *ngIf="model[colDef].projection == 'color' && (element | dotfield:colDef)">
+                            <app-tag [config]="{title: element | dotfield:colDef, bg: element | dotfield:colDef}">
+                            </app-tag>
+                        </ng-container>
+                        <ng-container *ngIf="model[colDef].static && model[colDef].projection != 'target__blank'">
+                            {{model[colDef].static}}
+                        </ng-container>
+                        <ng-container
+                            *ngIf="model[colDef].static && model[colDef].projection == 'target__blank' && (element | dotfield:colDef)">
+                            <a target="_blank"
+                                href="{{BASE_URL}}{{element | dotfield:colDef}}">{{model[colDef].static}}</a>
+                        </ng-container>
+                        <ng-container
+                            *ngIf="model[colDef].projection == 'htmlViewerToggle' && (element | dotfield:colDef)">
+                            <ng-container *ngIf="element.show;else showRef;">
+                                <button mat-stroked-button (click)="element.show = false" style="margin-top: 10px;"
+                                    class="btn btn-save">Hide</button>
+                                <!-- <div [innerHTML]="(element | dotfield:colDef | safeHtml)"></div> -->
+                                <quill-editor [ngModel]="element | dotfield:colDef" [readOnly]="true"></quill-editor>
+                            </ng-container>
+                            <ng-template #showRef>
+                                <button mat-stroked-button (click)="element.show = true"
+                                    class="btn btn-save">Show</button>
+                            </ng-template>
+                        </ng-container>
+                    </td>
+                </ng-container>
+
+
+                <!--=====================================================-->
+                <!--================== Action buttons ===================-->
+                <!--=====================================================-->
+                <ng-container *ngIf="colDef == 'actions'" matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef class="pdl-5">
+                        Actions
+                    </th>
+                    <td mat-cell *matCellDef="let row" class="pdl-5">
+                        <ng-container *ngIf="!readonly">
+                            <ng-container>
+                                <ng-container *ngIf="config?.edit?.permissions;else editButton">
+                                    <ng-container *ifRole="config?.edit?.permissions">
+                                        <ng-container *ngTemplateOutlet="editButton"></ng-container>
+                                    </ng-container>
+                                </ng-container>
+                                <ng-template #editButton>
+                                    <a class="mBadge" [matTooltip]="config?.edit?.tooltip || 'Edit'"
+                                        (click)="editRow($event, row)" *ngIf="config?.edit?.enabled">
+                                        <i class="fa fa-pen"></i> Edit
+                                    </a>
+                                </ng-template>
+                            </ng-container>
+
+                            <ng-container>
+                                <ng-container *ngIf="config?.delete?.permissions;else deleteButton">
+                                    <ng-container *ifRole="config?.delete?.permissions">
+                                        <ng-container *ngTemplateOutlet="deleteButton"></ng-container>
+                                    </ng-container>
+                                </ng-container>
+                                <ng-template #deleteButton>
+                                    <a class="mBadge" [matTooltip]="config?.delete?.tooltip || 'Delete'"
+                                        (click)="deleteRow($event, row)" *ngIf="config?.delete?.enabled">
+                                        <i class="fa fa-trash"></i> Delete
+                                    </a>
+                                </ng-template>
+                            </ng-container>
+                        </ng-container>
+
+                        <ng-container *ngFor="let icon of config?.icons;">
+                            <a class="mBadge" (click)="actionIconClicked($event, icon, row)" *ngIf="!icon.ifField || (icon.ifField && (
+                                (icon.ifFieldPresent && row[icon.ifField]) || 
+                                (!icon.ifFieldPresent && !row[icon.ifField])
+                                ))">
+
+                                <i class="fa fa-{{icon.icon}}" [matTooltip]="icon.tooltip"></i>
+                                <span *ngIf="icon.title">&nbsp;{{icon.title}}</span>
+                            </a>
+                        </ng-container>
+
+                    </td>
+                </ng-container>
+
+            </ng-container>
+
+            <tr class="header" mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr [class.highlight]="row.selected" [style.cursor]="config?.rowClicked ? 'pointer': 'default'" mat-row
+                *matRowDef="let row; columns: displayedColumns;let i=index;" (click)="rowClicked(row)">
+            </tr>
+        </table>
+        <mat-paginator [class.hide]="(waitingApi || !allRecords?.length)" *ngIf="config?.pagination"
+            (page)="fetchData()"
+            [length]="data && config?.pagination?.countField ? (data | dotfield:config?.pagination.countField) : 0"
+            [pageSize]="config?.pagination.perPage"
+            [pageSizeOptions]="[5, 10, 20, 50, 100, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]"
+            showFirstLastButtons>
+        </mat-paginator>
+    </div>
+    <div class="col-md-12 text-center" *ngIf="!(waitingApi || allRecords?.length)">
+        <img src="assets/images/no-record.png" />
+        <h3>No data to present yet</h3>
+    </div>
+    <ngx-spinner [fullScreen]="false" bdColor="rgba(51,51,51,0.8)" color="#fff" [type]="spinnerType"
+        title="Click to hide" (click)="spinner.hide()"></ngx-spinner>
+
+    <ng-container *ngIf="!config?.addButton?.hide">
+        <ng-container *ngIf="config?.addButton?.permissions;else btnFab">
+            <ng-container *ifRole="config?.addButton?.permissions">
+                <ng-container *ngTemplateOutlet="btnFab"></ng-container>
+            </ng-container>
+        </ng-container>
+        <ng-template #btnFab>
+            <ng-container
+                *ngIf="config?.addButton && (!config?.addButton?.position || config?.addButton?.position == 'fab')">
+                <button *ngIf="!config?.customForm?.bulk?.enabled" class="fab-1" mat-fab color="warn"
+                    [matTooltip]="config?.addButton?.tooltip" (click)="onFabClicked()">
+                    <mat-icon>{{config?.addButton?.icon || 'add'}}</mat-icon>
+                </button>
+                <smd-fab-speed-dial *ngIf="config?.customForm?.bulk?.enabled" class="fab-1" id="speed-fab"
+                    [open]="false" direction="up" animationMode="scale" [fixed]="false" #myFab
+                    (mouseenter)="myFab.open = true" (mouseleave)="myFab.open = false">
+                    <smd-fab-trigger [spin]="true">
+                        <button mat-fab color="warn" matTooltip="" matTooltipPosition="before" (click)="onFabClicked()">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                    </smd-fab-trigger>
+                    <smd-fab-actions>
+                        <button mat-mini-fab color="warn" matTooltip="Add Single" matTooltipPosition="before"
+                            (click)="onFabClicked()">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                        <button mat-mini-fab color="primary" matTooltip="Upload Bulk CSV" matTooltipPosition="before"
+                            (click)="openCsvUploaderDialog()">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                    </smd-fab-actions>
+                </smd-fab-speed-dial>
+            </ng-container>
+        </ng-template>
+    </ng-container>
+
+</ng-container>

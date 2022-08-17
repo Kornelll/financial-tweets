@@ -1,0 +1,182 @@
+.float-left {
+  float: left;
+}
+
+.doc-main-container {
+  font-family: "Nunito", sans-serif;
+}
+
+.top-15 {
+  margin-top: 15px;
+}
+
+h1 {
+  font-size: 16px;
+  margin: 0;
+}
+h2 {
+  font-size: 16px;
+  margin-top: 0;
+  font-weight: bold;
+}
+.mat-list .mat-list-item,
+.mat-list .mat-list-option,
+.mat-nav-list .mat-list-item,
+.mat-nav-list .mat-list-option,
+.mat-selection-list .mat-list-item,
+.mat-selection-list .mat-list-option {
+  display: block;
+  height: 25px;
+}
+
+.my-drop-zone {
+  border: dotted 3px lightgray;
+}
+
+.nv-file-over {
+  border: dotted 3px green;
+}
+
+/* Default class applied to drop zones on over */
+
+.attachments-nav {
+  margin-top: 0px;
+}
+.badge {
+  background-color: transparent !important;
+}
+.attachments-nav .flex-wrapper .form-control {
+  margin-bottom: 5px;
+  box-shadow: rgba(0, 0, 0, 0.1) -1px 2px 8px 0px;
+  font-size: 13px;
+}
+
+.attachments-nav .well {
+  background-color: #fffbf5;
+  color: #243238;
+  text-align: center;
+  line-height: 50px;
+  min-height: 50px;
+  border: 1px solid #ebedef;
+  font-weight: 700;
+  border-radius: 0;
+}
+
+.error {
+  font-size: 12px;
+  color: red;
+}
+
+.upload-area .upload-drop-zone {
+  margin-bottom: 0;
+}
+
+.file-upload-btn i {
+  cursor: pointer;
+}
+
+input {
+  font: inherit;
+}
+
+#fake-file-input-name:focus {
+  color: transparent;
+}
+
+i {
+  cursor: pointer;
+  color: #243238;
+}
+.list-group {
+  font-size: 13px;
+}
+.list-group-item i {
+  margin-right: 15px;
+  font-size: 14px;
+}
+.list-group img {
+  width: 20%;
+}
+.list-group mat-form-field {
+  width: 140px;
+  margin-right: 20px;
+  margin-top: 20px;
+}
+
+.list-group .title {
+  word-break: break-all;
+  cursor: pointer;
+}
+
+.attachments-nav .flex-wrapper .input-fields {
+  flex-grow: 1;
+}
+
+.attachments-nav .flex-wrapper .file-upload-btn a {
+  max-width: 40px;
+  min-width: 33px;
+  height: 29px;
+  display: block;
+  border: 1px solid #cccccc;
+  border-radius: 3px;
+  box-shadow: rgba(0, 0, 0, 0.1) -1px 2px 8px 0px;
+  text-align: center;
+  padding-top: 2px;
+}
+
+.flex-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  /* background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.1) -1px 2px 8px 0px;
+  padding: 15px; */
+}
+
+.attachments-nav .flex-wrapper {
+  justify-content: space-between;
+}
+
+.attachments-nav .v-list > li > .doc-info {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
+.badge {
+  cursor: pointer;
+}
+
+.list-group-item {
+  padding: 7px 9px;
+  margin-bottom: -1px;
+}
+
+.list-group-item:hover {
+  background-color: #dedede7d;
+}
+
+.form-control {
+  height: 29px;
+  border: 1px solid #ccc;
+  border-right: 0;
+  border-radius: 0;
+}
+
+.d-flex {
+  display: flex;
+}
+.d-flex-grow {
+  flex-grow: 1;
+}
+
+mat-spinner {
+  margin: initial;
+  margin-right: 10px;
+}
+
+.main-title {
+  color: black;
+}
+.sub-title {
+  color: #757575;
+  font-size: 12px;
+}

@@ -1,0 +1,117 @@
+<div
+    [ngClass]="{'has-expanded-side-nav': (isLeftNavShowing && isSideNavExpanded), 'has-collapsed-side-nav': (isLeftNavShowing && !isSideNavExpanded)}">
+    <nav class="menu-bar animated" [ngClass]="{slideInLeft: isLeftNavShowing, slideOutLeft: !isLeftNavShowing}">
+        <ul class="v-list">
+
+            <li *ngFor="let dashboardCard of dashboardService.dashboardCards">
+                <a routerlinkactive="active" *ngIf="dashboardCard.routerLink" href="#{{dashboardCard.routerLink}}"
+                    [class.active]="dashboardService?.routeData?.module == dashboardCard.module">
+                    <img *ngIf="dashboardCard.navImg" alt="Icon 3" class="img-responsive" [src]="dashboardCard.navImg">
+                    <i *ngIf="dashboardCard.navFa" [ngClass]="dashboardCard.navFa" aria-hidden="true"></i>
+                    <label *ngIf="isSideNavExpanded">{{dashboardCard.title}}</label>
+                </a>
+            </li>
+
+            <li class="bottom-item">
+                <a (click)="isSideNavExpanded = !isSideNavExpanded">
+                    <i class="fa fa-{{isSideNavExpanded ? 'compress' : 'expand'}}"></i>
+                    <span>{{isSideNavExpanded ? 'less' : 'more'}}</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div class="main-content-wrapper">
+        <nav class="navbar navbar-expand-md navbar fixed-top">
+            <i (click)="router.navigate(['/dashboard'])" class="fa fa-home btn-menu"></i>
+            <i [class.zero-opacity]="isDashboard || !dashboardService.currentList?.length" (click)="toggleSideNav()"
+                class="fa fa-bars btn-menu"></i>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01"
+                aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <mat-icon>account_circle</mat-icon>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <a class="navbar-brand" [routerLink]="['/dashboard']">Assignment - Financial Tweets</a>
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                    <!-- <li class="nav-item active">
+                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li> -->
+                    <ng-container *ngFor="let bread of dashboardService.routeData?.breads; let last=last;">
+                        <li class="nav-item">
+                            <a class="nav-link" [class.link]="bread.link"
+                                (click)="bread.link ? router.navigate([bread.link]): ''">
+                                {{bread.title}}
+                            </a>
+                        </li>
+                        <li class="nav-item" *ngIf="!last">
+                            <a class="nav-link slash">&nbsp;/&nbsp;</a>
+                        </li>
+                    </ng-container>
+                </ul>
+                <ng-template #loginTemplate>
+                    <a mat-button [routerLink]="['/login']">LOGIN</a>
+                </ng-template>
+                <ng-container *ngIf="userSvc?.user;else loginTemplate;">
+                    <div [matMenuTriggerFor]="menu" class="user-nav">
+                        <div class="text-section">
+                            <h6>{{userSvc?.user?.name | titlecase}}</h6>
+                            <ng-container *ngIf="userSvc.user">
+                                <span *ngIf="userSvc?.user?.role?.name">
+                                    <ng-container *ngIf="userSvc.user?.college?.name">
+                                        {{userSvc.user.college.name}} -
+                                    </ng-container>
+                                    {{userSvc.user.role.name}}
+                                </span>
+                            </ng-container>
+                        </div>
+                        <img
+                            [src]="userSvc?.user?.avatarSrc ? BASE_URL + userSvc?.user?.avatarSrc : 'assets/icons/user-icon.png'" />
+                    </div>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item (click)="changeDP()">
+                            <mat-icon>camera</mat-icon>
+                            <span>Change Picture</span>
+                        </button>
+                        <button mat-menu-item (click)="myAccount()">
+                            <mat-icon>account_circle</mat-icon>
+                            <span>My Account</span>
+                        </button>
+                        <button mat-menu-item (click)="loadManageNotificationDialog(userSvc?.user)">
+                            <mat-icon>notification_important</mat-icon>
+                            <span>Manage Notifications</span>
+                        </button>
+                        <button mat-menu-item (click)="openChangePasswordDialog()">
+                            <mat-icon>vpn_key</mat-icon>
+                            <span>Change Password</span>
+                        </button>
+                        <button mat-menu-item (click)="logout()">
+                            <mat-icon>power_settings_new</mat-icon>
+                            <span>Logout</span>
+                        </button>
+                    </mat-menu>
+                </ng-container>
+            </div>
+        </nav>
+        <div class="container-fluid content-container" cdkScrollable>
+            <div class="row" id="main-home-container">
+                <nav-list [class.sticky-nav]="!isSmallerScreen" class="col-md-2" *ngIf="!hideSideNav && !isDashboard">
+                </nav-list>
+                <div class="col-md-{{hideSideNav || isDashboard ? '12' : '10'}}"
+                    [style.margin-left]="hideSideNav || isDashboard || isSmallerScreen ? 0 : '16%'">
+                    <router-outlet></router-outlet>
+                </div>
+            </div>
+        </div>
+        <!-- <h1 *ngFor="let i of [1,2,3,4,5,6,7,8,9,0,5,4,3,4,5,6,7,45,3,4,5,3,3,5,6,6]">{{i}}</h1> -->
+    </div>
+    <footer>
+        <span class="release-notes" *ngIf="dashboardService?.lastRelease">
+            <a [routerLink]="['/configurations/release-notes']"
+                matTooltip="Latest Release">{{dashboardService?.lastRelease?.name}}
+                {{dashboardService?.lastRelease?.version}}
+            </a>
+        </span>
+    </footer>
+</div>
+<div matTooltip="Click to hide" (click)="loadingModule=false" *ngIf="loadingModule" class="router-load-indicator">
+    Please wait! Loading Module ...
+</div>

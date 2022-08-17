@@ -1,0 +1,67 @@
+<mat-form-field class="w-100">
+    <mat-chip-list #chipList>
+        <ng-container *ngFor="let item of config?.selectedOptions;let i=index;">
+            <mat-chip [selectable]="selectable" [removable]="removable"
+                *ngIf="showAll || !config?.showMaxChips || i < config?.showMaxChips" (removed)="remove(item)"
+                matTooltip="{{config.showProp ? item[config.showProp] : item[config.showProp]}}{{config?.showProp2Prefix || ''}}{{item | dotfield:config.showProp2}}{{config?.showProp3Prefix || ''}}{{item | dotfield:config.showProp3}}">
+                <ng-container *ngIf="config">{{item[config.showProp]}}</ng-container>
+                <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+            </mat-chip>
+        </ng-container>
+        <mat-chip (click)="showAll = !showAll" *ngIf="(config?.selectedOptions?.length - config?.showMaxChips) > 0"
+            color="primary" selected class="pointer">
+            <ng-container *ngIf="!showAll">
+                Show {{config?.selectedOptions?.length - config?.showMaxChips}} more
+            </ng-container>
+            <ng-container *ngIf="showAll">
+                Show Less
+            </ng-container>
+        </mat-chip>
+        <input #chipsInputView [formControl]="inputCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
+            (focus)="onFocus($event)" (click)="onFocus($event)" (matChipInputTokenEnd)="add($event)">
+    </mat-chip-list>
+    <span matPrefix *ngIf="config?.prefixLabel">{{config.prefixLabel}}: &nbsp;</span>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+        <cdk-virtual-scroll-viewport class="select-test-viewport" itemSize="48" minBufferPx="480" maxBufferPx="720">
+            <mat-option *cdkVirtualFor="let item of filteredOptions; let i=index;" [value]="item">
+                <label *ngIf="config">
+                    {{config.showProp ? item[config.showProp] : item[config.showProp]}}
+                    <span
+                        *ngIf="config?.showProp2">{{config?.showProp2Prefix || ''}}{{item | dotfield:config.showProp2}}</span>
+                    <span
+                        *ngIf="config?.showProp3">{{config?.showProp3Prefix || ''}}{{item | dotfield:config.showProp3}}</span>
+                </label>
+                <i [matTooltip]="config?.removeConfirmTooltip || 'Remove Item'" *ngIf="config?.removeConfirmMessage"
+                    class="fa fa-trash" (click)="removeEmail(item, i);$event.stopPropagation()"></i>
+            </mat-option>
+        </cdk-virtual-scroll-viewport>
+    </mat-autocomplete>
+</mat-form-field>
+<mat-hint *ngIf="config?.options?.length">
+    {{config?.options?.length ? config?.options?.length + ' records found' : ''}}
+</mat-hint>
+<div class="btn-section">
+    <ng-container *ngIf="config?.selectAll">
+        <button class="btn-save" [disabled]="!config?.options?.length" mat-raised-button color="primary"
+            (click)="selectAll()">
+            <i class="fas fa-mouse-pointer"></i>&nbsp;
+            Select All
+        </button>
+        <button [disabled]="!config?.options?.length" mat-stroked-button class="btn-cancel" (click)="selectAll(true)">
+            <i class="fa fa-times"></i>&nbsp;
+            Unselect All
+        </button>
+    </ng-container>
+    <button class="btn-save" *ngIf="config?.customForm" mat-raised-button color="primary"
+        [matTooltip]="config.customForm.btnTootltip" (click)="loadCustomForm()">
+        <i class="fas fa-user-plus"></i>&nbsp;
+        {{config.customForm.btnTitle}}
+    </button>
+    <button class="btn-save" matTooltip="csv file with headers e.g. name,email,phone" *ngIf="config?.customForm" mat-raised-button color="primary"
+         (click)="loadImportCsv()">
+        <i class="fas fa-upload"></i>&nbsp;
+        Import CSV File
+        <input #csvFile (change)="fileChangeListener($event)" type="file" style="display: none;">
+    </button>
+</div>

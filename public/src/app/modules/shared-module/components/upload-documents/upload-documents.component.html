@@ -1,0 +1,154 @@
+<div class="doc-main-container">
+    <div class="worklog-nav attachments-nav">
+        <ng-container *ngIf="!config?.filesLimit || (config?.fetch  && attached?.length < config?.filesLimit)">
+            <h2 *ngIf="config?.showLabels">Attach File</h2>
+            <!-- <h4>Attach File</h4> -->
+            <div class="flex-wrapper">
+                <div class="input-fields">
+
+                    <input type="file" id="files-input-upload" style="display:none" ng2FileSelect #fileUploadInput
+                        [uploader]="uploader" multiple accept=".csv,.pdf,.xls,.xlsx,.jpg,.jpeg,.gif">
+                    <input (click)="fileUploadInput.click();" type="text" id="fake-file-input-name"
+                        ondrop="return false;" (input)="$event.target.value = ''" placeholder="Attach File{{uploader?.options.queueLimit > 1 ? 's' : ''}}"
+                        class="form-control pointer">
+                </div>
+
+                <div class="file-upload-btn pointer" ondrop="return false;">
+                    <a (click)="fileUploadInput.click();" ondrop="return false;" id="fake-file-button-browse">
+                        <i class="fa fa-link"></i>
+                    </a>
+                </div>
+
+            </div>
+            <h2 *ngIf="config?.showLabels">Attachments</h2>
+            <!-- <div ng2FileDrop [ngClass]="{'nv-file-over': hasBaseDropZoneOver}" (fileOver)="fileOverBase($event)" [uploader]="uploader"
+            class="well my-drop-zone">
+            Or Drop Files here
+        </div> -->
+            <h1 class="error">{{errorMsg}}</h1>
+            <div>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                        *ngFor="let doc of uploader.queue;let i=index;">
+                        <mat-spinner *ngIf="submitted" [diameter]="20"></mat-spinner>
+                        <i *ngIf="!submitted" class="fa fa-file" aria-hidden="true"></i>
+                        <span class="d-flex-grow">
+                            <span>{{doc?.file?.name}}</span>
+                        </span>
+                        <span matTooltip="Remove Document" class="badge" (click)="removeFile(i);">
+                            <i class="fa fa-trash" style="color: #db024a !important"></i>
+                        </span>
+                    </li>
+                </ul>
+                <div class="progress" *ngIf="progress">
+                    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuemax="100"
+                        [style.width]="progress + '%'">
+                        {{progress}}%
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+        <div>
+            <div class="flex-wrapper">
+                <div class="input-fields">
+                    <input name="searchDocs" [(ngModel)]="searchQuery" (keyup)="onSearchInput();" type="text"
+                        id="search-file-input-name" [disabled]="!documents || !documents?.length"
+                        placeholder="Search Documents" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center"
+                *ngFor="let doc of filteredDocuments;let x=index;">
+                <span>
+                    <span class="pointer" matTooltip="Click to download!" (click)="downloadFile(doc);">
+                        <i class="fa fa-file" aria-hidden="true"></i>
+                        <span class="title" title="{{config?.fixedText ? doc?.originalname : ''}}">
+
+                            <span class="main-title">
+                                {{config?.fixedText ? doc?.fixedname : doc?.originalname}}
+                            </span>
+
+                            <span class="sub-title">
+                                {{doc.size / (1024 * 1024) | number:'1.1-2'}} MB
+                            </span>
+
+                            <span class="sub-title" *ngIf="doc?.user?.name">
+                                | uploaded by {{doc?.user?.name}}
+                            </span>
+
+                            <span class="sub-title" *ngIf="doc?.user?.department?.role?.name">
+                                ({{doc?.user?.department?.role?.name}})
+                            </span>
+
+                            <span class="sub-title" *ngIf="doc?.dated" [matTooltip]="doc?.dated | date:'full'">
+                                {{doc?.dated | dateAgo}}
+                            </span>
+
+                        </span>
+                    </span>
+                    <ng-container *ngIf="doc.view">
+                        <br>
+                        <ng-container *ngIf="doc.mimetype == 'image/jpeg' || doc.mimetype == 'image/gif' || doc.mimetype == 'image/png'">
+                            <mat-form-field>
+                                <input matInput placeholder="Image Zoom"
+                                    (blur)="imgWidth.value < 15 ? imgWidth.value = 15 : imgWidth.value > 100 ? imgWidth.value = 100 : ''"
+                                    type="number" [max]="100" [min]="15" #imgWidth [value]="20" />
+                                <span matSuffix>%</span>
+                            </mat-form-field>
+                            <i matTooltip="Zoom In" *ngIf="imgWidth.value < 100"
+                                (click)="imgWidth.value = 1 + +imgWidth.value" class="fa fa-plus"></i>
+                            &nbsp;&nbsp;
+                            <i matTooltip="Zoom Out" *ngIf="imgWidth.value > 15"
+                                (click)="imgWidth.value = -1 + +imgWidth.value" class="fa fa-minus"></i>
+
+                            <i matTooltip="Full View" (click)="imgWidth.value = imgWidth.value == 100 ? 15 : 100"
+                                class="fa fa-{{imgWidth.value == 100 ? 'compress' : 'expand'}}"></i>
+                            <br>
+                            <img src="{{doc.host}}/{{doc.path}}" [style.width]="imgWidth.value + '%'" />
+                        </ng-container>
+
+                        <iframe id="my-frame-viewer" *ngIf="doc.mimetype == 'application/pdf'"
+                            [attr.src]="doc.host + '/' +doc.path | safeHtml:'resource'" type="application/pdf"
+                            width="100%" height="100%"></iframe>
+
+                        <video *ngIf="doc.mimetype == 'video/mp4'" height="100%" width="100%" controls>
+                            <source [src]="doc.host + '/' +doc.path" type="video/mp4" />
+                            Browser not supported
+                        </video>
+
+                        <audio controlsList="nodownload" *ngIf="doc.mimetype == 'audio/mp3'" height="100%" width="100%"
+                            controls>
+                            <source [src]="doc.host + '/' +doc.path" type="audio/mp3" />
+                            Browser not supported
+                        </audio>
+
+                        <iframe height="100%" width="100%" *ngIf="
+                        doc.mimetype == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                        || doc.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        " src="https://docs.google.com/gview?url={{doc.host}}/{{doc.path}}&embedded=true"></iframe>
+
+
+                    </ng-container>
+                </span>
+                <span class="badge badge-primary badge-pill">
+                    <i class="fa fa-eye{{doc.view ? '-slash' : ''}}" (click)="doc.view = !doc.view"
+                        matTooltip="Preview"></i>
+                    <i class="fa fa-trash" style="color: #db024a !important" (click)="deleteDoc(doc, x)"
+                        matTooltip="Delete Document"
+                        *ifRole="{ app: {codes: ['files_delete'] }, dpt: {codes: ['files_delete'] }}"></i>
+                </span>
+            </li>
+        </ul>
+    </div>
+    
+    <!--overlay -->
+    <div *ngIf="submitted" class="preloading">
+        <div class="loading"></div>
+        <!-- <div class="custom">Uploading Files...</div> -->
+    </div>
+    <!-- <h4 class="error" *ngIf="errorMsg">
+        {{errorMsg | json}}
+    </h4> -->
+</div>

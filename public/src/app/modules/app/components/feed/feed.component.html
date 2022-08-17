@@ -1,0 +1,61 @@
+<div class="container-fluid">
+    <div class="row sticky-top">
+        <div class="col-md-6 text-center">
+            <h5>Total Tweets</h5>
+            <hr>
+            <h1>{{totalRecords}}</h1>
+        </div>
+        <div class="col-md-6 text-center">
+            <h5>Currently Showing</h5>
+            <hr>
+            <h1>{{data?.length}}</h1>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-6">
+            <mat-form-field appearance="fill">
+                <mat-label>Search keyword</mat-label>
+                <input matInput type="text" placeholder="e.g. #Royalty Model For #Green #Energy" [formControl]="inputCtrl">
+            </mat-form-field>
+        </div>
+        <div class="col-md-6">
+            <mat-form-field appearance="fill">
+                <mat-label>Search Company</mat-label>
+                <input matInput type="text" placeholder="e.g. Facebook, Tesla" [formControl]="inputCompanyCtrl">
+                <mat-checkbox matSuffix name="verified" [(ngModel)]="verified" (change)="resetAndFetch()">Identity Verified Company</mat-checkbox>
+            </mat-form-field>
+        </div>
+    </div>
+    <div class="row">
+        <div *ngFor="let tweet of data;" class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h5>
+                            <span>{{tweet.company?.name}}</span>
+                            <img src="assets/icons/verified.png" alt="" *ngIf="tweet.company?.verified"
+                                title="Identity Verified">
+                        </h5>
+                        <h6 class="text-gray">{{tweet.symbols}}</h6>
+                    </div>
+                    <p class="card-text font-weight-light">
+                        {{tweet.text}}
+                    </p>
+                </div>
+                <div class="card-body flex-space" *ngIf="tweet.timestamp || tweet.url">
+                    <span *ngIf="tweet.timestamp" class="text-gray" [title]="tweet.timestamp">{{tweet.timestamp |
+                        date}}</span>
+                    <a [href]="tweet.url" *ngIf="tweet.url" target="_blank" class="card-link">Read more</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12" *ngIf="fetching">
+            <mat-spinner></mat-spinner>
+        </div>
+        <button mat-button *ngIf="!lastResultZero" [disabled]="fetching" class="w-100" (click)="fetchTweets()">Load
+            More</button>
+    </div>
+</div>

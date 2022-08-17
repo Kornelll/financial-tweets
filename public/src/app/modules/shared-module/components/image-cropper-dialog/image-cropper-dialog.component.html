@@ -1,0 +1,28 @@
+<div class="image-cropper-dialog">
+    <h1>{{croppedImage ? 'Please Adjust file view and click done': 'Please choose file to continue'}}</h1>
+    <div class="scroll-container">
+        
+        <div >
+            <input #inputFile1 type="file" (change)="fileChangeEvent($event)" />
+            <mat-checkbox color="primary" name="maintainAspectRatio" [(ngModel)]="maintainAspectRatio">Maintain Ratio
+            </mat-checkbox>
+        </div>
+        <h6 class="error animated bounce" *ngIf="err">{{err}}</h6>
+        <div class="row">
+            <div class="col-md-{{preview ? '10' : '12'}}">
+                <image-cropper [roundCropper]="roundCropper" [imageChangedEvent]="imageChangedEvent"
+                    [maintainAspectRatio]="maintainAspectRatio" [aspectRatio]="aspectRatio" [resizeToWidth]="resizeToWidth"
+                    format="png" (imageCropped)="imageCropped($event)" (imageLoaded)="imageLoaded()"
+                    (loadImageFailed)="loadImageFailed()"></image-cropper>
+            </div>
+            <div class="col-md-2" *ngIf="preview">
+                <img [style.border-radius]="roundCropper ? '50%' : 0" [src]="croppedImage" />
+            </div>
+        </div>
+    </div>
+    <div class="btn-section">
+        <button mat-raised-button color="primary" (click)="done();" [disabled]="!croppedImage">Done</button>
+        <button mat-stroked-button (click)="cancel();">Cancel</button>
+    </div>
+
+</div>

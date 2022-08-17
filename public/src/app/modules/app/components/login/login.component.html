@@ -1,0 +1,296 @@
+<main class="row bg-anim">
+    <div class="col-md-12">
+        <form #mForm="ngForm" class="c-form bg-anim" [ngClass]="animateCss.one"
+            [style.margin-top]="openFor == 'register' ? '15px' : '100px'">
+            <fieldset class="c-form__fieldset">
+                <legend class="c-form__title">
+                    <label (click)="router.navigate(['/login'])" title="{{openFor == 'login' ? '' : 'Click to login'}}">
+                        <span style="text-decoration: underline;">Assignment Financial Tweets</span>
+                        <br>
+                        <span style="font-size: 8px;"></span>(Admin Login)
+                    </label>
+                </legend>
+
+                <div class="u-spacer--sm"></div>
+
+                <!--=====================================================-->
+                <!--========== Login and Forgot Password Forms ==========-->
+                <!--=====================================================-->
+                <ng-container *ngIf="openFor == 'login' || openFor == 'forgot-password'">
+                    <label class="c-formGroup" for="email">
+                        <input trim="blur" autofocus required [disabled]="processing" name="email"
+                            [(ngModel)]="model.email" class="c-formGroup__input u-ripple" type="email" id="email"
+                            placeholder="E.g. xxxx@xxx.xx">
+                        <span class="c-formGroup__title">Email</span>
+                        <i class="c-formGroup__icon fa fa-envelope"></i>
+                    </label>
+
+                    <ng-container *ngIf="openFor != 'forgot-password'">
+                        <div class="u-spacer"></div>
+                        <label class="c-formGroup" for="password">
+                            <input #password="ngModel" autofocus required [disabled]="processing" name="password"
+                                [(ngModel)]="model.password" class="c-formGroup__input u-ripple" type="password"
+                                id="password" placeholder="Password">
+                            <span class="c-formGroup__title">Password</span>
+                            <i class="c-formGroup__icon fa fa-lock"></i>
+                        </label>
+                    </ng-container>
+
+                    <ng-container *ngIf="recaptchaRequired">
+                        <div class="u-spacer-recaptcha"></div>
+                        <label class="c-formGroup" for="department">
+                            <re-captcha #recaptcha (resolved)="resolvedReCaptcha($event)"
+                                [siteKey]="SITE_KEY_RECAPTCHA">
+                            </re-captcha>
+                        </label>
+                        <div class="mb-30"></div>
+                    </ng-container>
+
+                    <div class="u-spacer--sm mb"></div>
+
+                    <button [disabled]="processing || mForm.invalid || (recaptchaRequired && !recaptchsResolved)"
+                        type="button" (click)="submit()" class="c-form__button u-ripple">
+                        <mat-spinner *ngIf="processing;else loginLabel" color="warn" [diameter]="35"></mat-spinner>
+                        <ng-template #loginLabel>
+                            <ng-container *ngIf="openFor == 'login'">Login</ng-container>
+                            <ng-container *ngIf="openFor == 'forgot-password'">Request Change Password</ng-container>
+                        </ng-template>
+                    </button>
+                </ng-container>
+                <!--=====================================================-->
+
+
+                <!--=====================================================-->
+                <!--=================== Register Form ===================-->
+                <!--=====================================================-->
+                <ng-container *ngIf="openFor == 'register'">
+                    <ng-container *ngIf="registerSuspended">
+                        Registration Feature has been locked. Please try later when Portal will be opened
+                        publicly.
+                    </ng-container>
+                    <ng-container *ngIf="!registerSuspended">
+                        <label class="c-formGroup" for="name">
+                            <input trim="blur" #name="ngModel" required autofocus [disabled]="processing" name="name"
+                                [(ngModel)]="model.name" class="c-formGroup__input u-ripple" type="name" id="name"
+                                placeholder="Full Name e.g. John Doe">
+                            <span class="c-formGroup__title">Name *</span>
+                            <i class="c-formGroup__icon fa fa-user">
+                            </i>
+                        </label>
+                        <label class="error-msg"
+                            *ngIf="errors?.name || (name?.errors && mForm?.touched && mForm?.dirty)"
+                            [ngClass]="animateCss.three">
+                            {{errors?.name?.message}}
+                            <ng-container *ngIf="name?.errors?.required">Name is required</ng-container>
+                        </label>
+
+                        <div class="u-spacer"></div>
+                        <label class="c-formGroup" for="email">
+                            <input trim="blur" #email="ngModel" required [disabled]="processing" name="email"
+                                [(ngModel)]="model.email" class="c-formGroup__input u-ripple" type="email" id="email"
+                                placeholder="xxxxxxxxxx@xxxxx.xxx" pattern="[^@]+@[^@]+\.[a-zA-Z]{2,6}">
+                            <span class="c-formGroup__title">Email ID *</span>
+                            <i class="c-formGroup__icon fa fa-envelope"></i>
+                        </label>
+                        <label class="error-msg"
+                            *ngIf="errors?.email || (email?.errors && mForm?.touched && mForm?.dirty)"
+                            [ngClass]="animateCss.three">
+                            {{errors?.email?.message}}
+                            <ng-container *ngIf="email?.errors?.required">Email is required</ng-container>
+                            <ng-container *ngIf="email?.errors?.pattern">Please provide a valid email</ng-container>
+                        </label>
+
+                        <div class="u-spacer"></div>
+                        <label class="c-formGroup" for="phone">
+                            <input #phone="ngModel" required mask='(00)-(000)-0000000' [showMaskTyped]="true"
+                                [disabled]="processing" name="phone" [(ngModel)]="model.phone"
+                                class="c-formGroup__input u-ripple" type="phone" id="phone"
+                                placeholder="(xx)-(xxx)-xxxxxxx">
+                            <span class="c-formGroup__title">Phone *</span>
+                            <i class="c-formGroup__icon fa fa-phone"></i>
+                        </label>
+                        <label class="error-msg"
+                            *ngIf="errors?.phone || (phone?.errors && mForm?.touched && mForm?.dirty)"
+                            [ngClass]="animateCss.three">{{errors?.phone?.message}}
+                            <ng-container *ngIf="phone?.errors?.required">Phone is required</ng-container>
+                            <ng-container *ngIf="phone?.errors && phone?.errors['Mask error']">Please provide a valid
+                                phone
+                            </ng-container>
+                        </label>
+
+                        <div class="u-spacer"></div>
+                        <label class="c-formGroup" for="cnic">
+                            <input #cnic="ngModel" required
+                                [mask]="model?.overseas ? '0000-00000000-0' : '00000-0000000-0'" [showMaskTyped]="true"
+                                [disabled]="processing" name="cnic" [(ngModel)]="model.cnic"
+                                class="c-formGroup__input u-ripple" type="text" id="cnic"
+                                [placeholder]="model?.overseas ? '0000-00000000-0' : '00000-0000000-0'">
+                            <span class="c-formGroup__title">CNIC / Form-B *
+
+                                <a (click)="model.overseas = !model.overseas; $event.stopPropagation()"> |
+                                    {{model.overseas ? 'Pakistanis Click Here' : 'Overseas Click Here'}}</a>
+                            </span>
+                            <i class="c-formGroup__icon fa fa-address-card"></i>
+
+                        </label>
+                        <label class="error-msg"
+                            *ngIf="errors?.cnic || (cnic?.errors && mForm?.touched && mForm?.dirty)"
+                            [ngClass]="animateCss.three">{{errors?.cnic?.message}}
+                            <ng-container *ngIf="cnic?.errors?.required">cnic is required</ng-container>
+                            <ng-container *ngIf="cnic?.errors && cnic?.errors['Mask error']">Please provide a valid cnic
+                            </ng-container>
+                        </label>
+
+                        <div class="u-spacer"></div>
+                        <label class="c-formGroup" for="password">
+                            <input #password="ngModel" required [disabled]="processing" name="password"
+                                [(ngModel)]="model.password" class="c-formGroup__input u-ripple" type="password"
+                                id="password"
+                                title="Strong passwords contains uppercase, lowercase, numbers & special characters"
+                                placeholder="Password">
+                            <span class="c-formGroup__title">Password *</span>
+                            <i class="c-formGroup__icon fa fa-lock"></i>
+                        </label>
+                        <label class="error-msg"
+                            *ngIf="errors?.password || (password?.errors && mForm?.touched && mForm?.dirty)"
+                            [ngClass]="animateCss.three">{{errors?.password?.message}}
+                            <ng-container *ngIf="password?.errors?.required">Password is required</ng-container>
+                        </label>
+
+
+                        <!-- <div class="u-spacer"></div>
+                <label class="c-formGroup" for="department">
+                    <app-autocomplete placeholder="Search and select" floatLabel="never"
+                        class="c-formGroup__input u-ripple" [ignoreLogout]="true" responseProp="data" displayProp="name"
+                        (selected)="onDepartmentSelected($event)" url="{{API_ENDPOINT}}/departments/public?name="
+                        appearance="legacy">
+                    </app-autocomplete>
+                    <span class="c-formGroup__title">Department *</span>
+                    <i class="c-formGroup__icon fa fa-building"></i>
+                </label>
+
+                <ng-container *ngIf="model?.department?.role">
+                    <div class="u-spacer"></div>
+                    <label class="c-formGroup" for="mRole">
+                        <select [(ngModel)]="model.department.role" required
+                            [disabled]="processing" name="mRole" class="c-formGroup__input u-ripple" id="mRole"
+                            placeholder="mRole">
+                            <i class="c-formGroup__icon fa fa-lock"></i>
+
+                            <option *ngFor="let role of dptRoles" [ngValue]="role">{{role.name}}</option>
+                        </select>
+                        <span class="c-formGroup__title">I'm *</span>
+                    </label>
+                </ng-container> -->
+
+                        <div class="u-spacer-recaptcha"></div>
+                        <label class="c-formGroup" for="department">
+                            <re-captcha #recaptcha (resolved)="resolvedReCaptcha($event)"
+                                [siteKey]="SITE_KEY_RECAPTCHA">
+                            </re-captcha>
+                        </label>
+
+
+                        <div class="u-spacer mb"></div>
+                        <button [disabled]="processing || mForm.invalid || !recaptchsResolved" type="button"
+                            (click)="submit()" class="c-form__button u-ripple">
+                            <mat-spinner *ngIf="processing;else loginLabel" color="warn" [diameter]="35"></mat-spinner>
+                            <ng-template #loginLabel>
+                                Register
+                            </ng-template>
+                        </button>
+                    </ng-container>
+                </ng-container>
+                <!--=====================================================-->
+
+
+                <!--=====================================================-->
+                <!--================ Reset password Form ================-->
+                <!--=====================================================-->
+                <ng-container *ngIf="openFor == 'reset-password'">
+                    <label class="c-formGroup" for="password">
+                        <input #password="ngModel" autofocus required [disabled]="processing" name="password"
+                            [(ngModel)]="resetModel.newPassword" class="c-formGroup__input u-ripple" type="password"
+                            id="password" placeholder="Password">
+                        <span class="c-formGroup__title">New Password *</span>
+                        <i class="c-formGroup__icon fa fa-lock"></i>
+                    </label>
+
+                    <div class="u-spacer"></div>
+                    <label class="c-formGroup" for="password2">
+                        <input #password2="ngModel" required [disabled]="processing" name="password2"
+                            [(ngModel)]="resetModel.matchPassword" class="c-formGroup__input u-ripple" type="password"
+                            id="password2" placeholder="Re-Enter Password">
+                        <span class="c-formGroup__title">Re-Enter Password *</span>
+                        <i class="c-formGroup__icon fa fa-lock"></i>
+                    </label>
+
+                    <div class="u-spacer--sm mb"></div>
+
+                    <button
+                        [disabled]="processing || mForm.invalid || resetModel.newPassword != resetModel.matchPassword"
+                        type="button" (click)="resetPassword()" class="c-form__button u-ripple">
+                        <mat-spinner *ngIf="processing;else loginLabel" color="warn" [diameter]="35"></mat-spinner>
+                        <ng-template #loginLabel>
+                            Reset Password
+                        </ng-template>
+                    </button>
+                </ng-container>
+                <!--=====================================================-->
+
+                <!--=====================================================-->
+                <!--================ Activation Form ================-->
+                <!--=====================================================-->
+                <ng-container *ngIf="openFor == 'activate-account'">
+                    <div>
+                        Didn't Receive Activation Code? <button mat-button (click)="resendActivationCode()">Resend
+                            Code</button>
+                    </div>
+                    <label>
+                        {{activateModel.email}}
+                    </label>
+                    <div class="u-spacer"></div>
+
+                    <label class="c-formGroup" for="activateCode">
+                        <input #activateCode="ngModel" required [disabled]="processing" name="activateCode"
+                            [(ngModel)]="activateModel.code" class="c-formGroup__input u-ripple" type="text"
+                            id="activateCode" mask='0-0-0-0-0-0' [showMaskTyped]="true"
+                            placeholder="6-digits activation code you received">
+                        <span class="c-formGroup__title">Activation Code</span>
+                        <i class="c-formGroup__icon fa fa-lock"></i>
+                    </label>
+
+                    <div class="u-spacer"></div>
+                    <label class="c-formGroup" for="password">
+                        <input #password="ngModel" autofocus required [disabled]="processing" name="password"
+                            [(ngModel)]="activateModel.password" class="c-formGroup__input u-ripple" type="password"
+                            id="password" placeholder="Password">
+                        <span class="c-formGroup__title">Your Password *</span>
+                        <i class="c-formGroup__icon fa fa-lock"></i>
+                    </label>
+
+                    <div class="u-spacer--sm mb"></div>
+
+                    <button [disabled]="processing || mForm.invalid" type="button" (click)="activateAccount()"
+                        class="c-form__button u-ripple">
+                        <mat-spinner *ngIf="processing;else loginLabel" color="warn" [diameter]="35"></mat-spinner>
+                        <ng-template #loginLabel>
+                            Activate Account
+                        </ng-template>
+                    </button>
+                </ng-container>
+                <!--=====================================================-->
+
+            </fieldset>
+        </form>
+        <form [ngClass]="animateCss.two" class="c-form bg-anim" style="margin-top: 10px;height: 69px;margin-bottom: 15px;">
+            <a class="c-form__link u-ripple" [ngClass]="animateCss.three" (click)="decideSignInUp()">
+                {{openFor == 'login' ? 'Dont have an account?' : 'I already have an account'}}
+            </a>
+            <ng-container *ngIf="openFor != 'forgot-password'">|
+                <a class="c-form__link u-ripple" [ngClass]="animateCss.three" [routerLink]="['/forgot-password']">Forgot
+                    Password?</a>
+            </ng-container>
+        </form>
+    </div>
+</main>

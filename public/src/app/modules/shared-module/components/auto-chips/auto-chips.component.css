@@ -1,0 +1,31 @@
+mat-option i {
+    margin-top: 15px;
+    opacity: 0;
+}
+mat-option:hover i {
+    opacity: 1;
+    transition: opacity 0.4s ease-in;
+}
+mat-option label {
+    width: 95%;
+    font-weight: normal;
+    font-size: 15px;
+}
+.hide {
+    display: none;
+}
+
+
+.select-test-viewport {
+    height: 192px;
+    width: 100%;
+    border: 1px solid gray;
+}
+.autocomplete-test-viewport {
+    height: 250px;
+    border: 1px solid gray;
+}
+.autocomplete-item {
+    height: 50px;
+}
+  

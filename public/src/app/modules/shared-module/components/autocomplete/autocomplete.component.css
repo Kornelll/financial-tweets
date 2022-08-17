@@ -1,0 +1,12 @@
+.pointer {
+    cursor: pointer;
+}
+
+.hide {
+    display: none;
+}
+
+.suffix-icons {
+    margin-right: 8px;
+    cursor: pointer;
+}

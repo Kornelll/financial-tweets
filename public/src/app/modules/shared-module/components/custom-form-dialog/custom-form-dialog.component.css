@@ -1,0 +1,97 @@
+.main-container-1 {
+    min-width: 230px;
+}
+mat-form-field {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.error {
+    font-size: 13px;
+    color: red;
+}
+
+.title {
+    background-image: linear-gradient(to left, #00000087, #00172e);
+    padding: 8px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+h1 {
+    font-size: 23px;
+}
+h6 {
+    font-size: 14px;
+}
+
+button.btn-save, button.btn-confirm {
+    background-color: #0879fab0;
+    border: 0px;
+    border-radius: 0px;
+    box-shadow: none;
+    color: white;
+}
+
+button.btn-save:disabled, button.btn-confirm:disabled {
+    background-color: #dedede;
+}
+
+button.btn-save:hover:not(:disabled), button.btn-confirm:hover:not(:disabled) {
+    background-color: #0879fa;
+}
+
+button.btn-cancel {
+    background-color: #343a40;
+    border: 0px;
+    border-radius: 0px;
+    box-shadow: none;
+    color: white;
+    margin-right: 5px;
+}
+
+.success {
+    color: #25fc2d;
+  }
+.red {
+    color: #ff8936;
+}
+.warn {
+    color: #ffbf00;
+}
+.info-icon {
+    color: #0879fa;
+}
+.checkbox-field {
+    margin-bottom: 15px;;
+}
+
+.color-field mat-form-field {
+    width: 50%;
+}
+
+.scroll-container-dialog {
+    max-height: calc(100vh - 150px);
+    overflow: auto;
+}
+.editor-field {
+    margin-bottom: 20px;
+}
+
+mat-button-toggle-group {
+    flex-wrap: wrap;
+}
+.radio-content {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+}
+
+.radio-content mat-icon {
+    font-size: 21px;
+}
+.progress-bar-1 {
+    margin-top: 40px;
+    padding-right: 0;
+    padding-left: 0;
+}

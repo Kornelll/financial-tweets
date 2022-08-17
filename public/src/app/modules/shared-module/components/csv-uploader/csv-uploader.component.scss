@@ -1,0 +1,39 @@
+mat-card {
+    margin-right: 10px;
+    cursor: pointer;
+    border: 2px inset #80808000;
+    transition: .2s all ease-in-out;
+}
+
+mat-card:hover {
+    border: 2px inset #FF9800;
+    transition: .2s all ease-in-out;
+}
+
+mat-card i {
+    font-size: 38px;
+}
+
+mat-card.active {
+    border: 2px inset #FF9800;
+    background-color: #e2e2e2;
+    transition: .2s all ease-in-out;
+}
+
+table tr td:first-child {
+    vertical-align: middle;
+}
+
+div button {
+    margin-right: 10px;
+}
+
+td i {
+    font-size: 16px;
+}
+
+.select-test-viewport {
+    height: 250px;
+    width: 100%;
+    border: 1px solid gray;
+}

@@ -1,0 +1,47 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "types": []
+  },
+  "files": [
+    "src/main.ts",
+    "src/polyfills.ts"
+  ],
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/test.ts",
+    "src/**/*.spec.ts"
+  ],
+  "paths": {
+    "@/components/app": [
+      "src/app/modules/app/components",
+    ],
+    "@/components/configurations": [
+      "src/app/modules/configurations-module/components",
+    ],
+    "@/components/shared": [
+      "src/app/modules/shared-module/components",
+    ],
+    "@/components/users": [
+      "src/app/modules/users-module/components",
+    ],
+    "@services": [
+      "src/app/services"
+    ],
+    "@/settings": [
+      "src/app/app.settings"
+    ],
+    "@/directives": [
+      "src/app/directives"
+    ],
+    "@/scripts": [
+      "src/app/scripts"
+    ],
+    "@/table-params": [
+      "src/app/custom-table-params"
+    ]
+  }
+}

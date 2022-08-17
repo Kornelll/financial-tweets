@@ -1,0 +1,59 @@
+<html>
+
+<head>
+    <style>
+        body {
+            padding: 10%;
+            text-align: center;
+        }
+
+        .card-2 {
+            padding: 20px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+        }
+
+        h1 {
+            font-size: 14px;
+        }
+
+        /* Material style */
+
+        button {
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 2px;
+            font-size: 22px;
+            font-family: "Open Sans", sans-serif;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, .4);
+            background: black;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card card-2">
+        <center>
+            <div style="width: 99%; background: black; padding: 5px;">
+                <img style="background: black;" src="http://www.nextbridge.pk/wp-content/uploads/2016/05/NB-logo-for-NB-website.png" />
+            </div>
+            <hr>
+            <h1 style="transform: scaleY(1.14);transform-origin: 0 0;">
+                <%= title %>
+            </h1>
+            <p>
+                <%= heading1 %>
+            </p>
+            <p>
+                <a href="<%= link %>">
+                    <button>
+                        <%= btnText %>
+                    </button>
+                </a>
+            </p>
+        </center>
+    </div>
+</body>
+
+</html>
